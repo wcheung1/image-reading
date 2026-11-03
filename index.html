@@ -96,6 +96,24 @@ dialog .f{margin-bottom:12px}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:20px;font-size:14px;opacity:0;transition:.2s;pointer-events:none;z-index:50;max-width:90vw}
 .toast.on{opacity:1}
 hr.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
+.advice{margin-top:12px;font-size:14px}
+.advice .vi{display:flex;gap:10px;align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px}
+.advice .vi img{width:72px;height:48px;object-fit:cover;border-radius:6px;flex:none;background:var(--line)}
+.advice .vi b{display:block}
+.advice .vi .why{font-size:13px;color:var(--sub)}
+.advice .rec{background:var(--acc2);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.advice .rec ul{margin:6px 0 0;padding-left:20px;font-size:13px;color:var(--sub)}
+table.cost{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
+table.cost th,table.cost td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+table.cost th:first-child,table.cost td:first-child{text-align:left;white-space:normal}
+table.cost th{font-weight:600;color:var(--sub);font-size:12.5px}
+table.cost tbody tr{cursor:pointer}
+table.cost tbody tr:hover{background:var(--acc2)}
+table.cost tr.sel{background:var(--acc2);font-weight:600}
+table.cost tr.sel td:first-child::before{content:'✓ ';color:var(--acc)}
+table.cost tr.rec td:first-child::after{content:' ⭐';}
+.costwrap{overflow-x:auto;margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:4px 8px 8px}
+.costwrap h3{font-size:14px;margin:6px 0 0}
 </style>
 </head>
 <body>
@@ -121,7 +139,8 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
           <option value="1280">慳 token：長邊 1280px（相片、大字）</option>
           <option value="1600">標準：長邊 1600px（大部分文件）</option>
           <option value="2048">清晰：長邊 2048px（細字、密麻麻）</option>
-        </select></div>
+        </select>
+        <div class="note" id="resNote"></div></div>
       <div><label class="chk" style="margin:0 0 8px"><input type="checkbox" id="slice"> 長截圖自動切段（長過闊 2.5 倍就切，唔會縮到睇唔到字）</label></div>
     </div>
     <div id="vidBox" hidden>
@@ -131,11 +150,13 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
       <div class="row">
         <div><label class="lb" for="vMethod">點樣送俾 AI</label>
           <select id="vMethod">
-            <option value="frames">抽格分析（建議：所有格式都得，慳 token，私隱最好）</option>
-            <option value="direct">原片直送（實驗性：AI 自己睇成段片；唔得會自動轉返抽格）</option>
+            <option value="auto">自動（建議）</option>
+            <option value="frames">抽格分析</option>
+            <option value="direct">原片直送（實驗性；唔得會自動轉返抽格）</option>
           </select></div>
         <div><label class="lb" for="vMax">最多抽幾多格</label>
           <select id="vMax">
+            <option value="auto">自動（按片長建議）</option>
             <option value="12">12 格（短片、最慳）</option>
             <option value="24">24 格（一般短片）</option>
             <option value="40">40 格（建議）</option>
@@ -144,12 +165,15 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
           </select></div>
         <div><label class="lb" for="vRes">每格解像度</label>
           <select id="vRes">
+            <option value="auto">自動（按內容建議）</option>
             <option value="768">768px（最慳）</option>
             <option value="1024">1024px（建議）</option>
             <option value="1280">1280px（要睇細字幕）</option>
           </select></div>
       </div>
       <label class="chk"><input type="checkbox" id="vSmart"> 智能揀格：淨係揀畫面有變嘅位（靜止畫面唔會重複送，慳 token）</label>
+      <div id="vidAdvice" class="advice" aria-live="polite"></div>
+      <div id="vidCost"></div>
     </div>
   </section>
 
@@ -227,6 +251,11 @@ hr.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
       <div><label class="lb" for="cMax">輸出上限（token）</label>
         <input type="number" id="cMax" min="1000" max="128000" step="1000"></div>
     </div>
+    <div class="row" style="margin-top:8px">
+      <div><label class="lb" for="cPriceIn">輸入價（US$／每百萬 token）</label><input type="number" id="cPriceIn" min="0" step="0.01"></div>
+      <div><label class="lb" for="cPriceOut">輸出價（US$／每百萬 token）</label><input type="number" id="cPriceOut" min="0" step="0.01"></div>
+    </div>
+    <div class="note">用嚟估成本。預設係 Z.ai 官方 GLM-5.3-Flash 標價（輸入 0.15、輸出 0.50）；用 Coding Plan 包月就當參考。</div>
     <div class="note">GLM-5.3 系列嘅思考熄唔到，所以用 low 嚟慳時間。成版密麻麻嘅字嫌唔夠位，就加大輸出上限（思考都會扣呢個額度）。</div>
     <div class="go" style="margin-top:16px">
       <button class="btn" type="button" id="cTest">🔎 試一試</button>
@@ -257,7 +286,7 @@ const CFG_KEY = 'glmvision_cfg_v2';
 const TPL_KEY = 'glmvision_tpl_v1';
 const DEF = {base:'', key:'', remember:true, model:'glm-5.3-flash', effort:'low', maxTok:16000,
              mode:'ocr', lang:'zh-Hant', res:'1600', slice:true,
-             vMethod:'frames', vMax:'40', vRes:'1024', vSmart:true};
+             vMethod:'auto', vMax:'auto', vRes:'auto', vSmart:true, priceIn:0.15, priceOut:0.50, tokCal:1, tokCalN:0};
 let memKey = '';   /* 唔記住 key 嗰陣，key 淨係住喺呢度（記憶體） */
 function cfg(){
   let c;
@@ -655,7 +684,7 @@ function ffCall(msg, transfer){
 }
 function ffKill(){
   if(ff){ try{ ff.terminate(); }catch(e){} }
-  ff = null; ffReady = null;
+  ff = null; ffReady = null; ffFiles.clear();
   Object.keys(ffPending).forEach(function(k){ ffPending[k].rej(abortErr()); delete ffPending[k]; });
 }
 function ffLoad(note){
@@ -699,16 +728,33 @@ function parseDur(logs){
   return 0;
 }
 function scaleExpr(px){ return "scale='trunc(min(1,"+px+"/max(iw,ih))*iw/2)*2':'trunc(min(1,"+px+"/max(iw,ih))*ih/2)*2'"; }
+/* 已經放咗入解碼器嘅片（上載嗰陣量長度時放入去），開始分析就唔使再搬一次 */
+const ffFiles = new Map();
+let ffNameSeq = 0;
+function parseDims(logs){
+  for(const s of logs){ const m = /Video:.*?\b(\d{2,5})x(\d{2,5})\b/.exec(s); if(m) return {w:+m[1], h:+m[2]}; }
+  return {w:0, h:0};
+}
 async function ffOpen(file, note, signal){
+  const got = ffFiles.get(file);
+  if(got && ff) return got;
   if(file.size > FF_MAX_BYTES) throw new Error('呢段片太大（' + kb(file.size) + '）。要用解碼器嘅格式上限約 600MB；請先剪短或者轉做 MP4。');
   await ffLoad(note);
   if(signal && signal.aborted) throw abortErr();
-  const name = 'in.' + vidExt(file.name);
+  const name = 'in' + (++ffNameSeq) + '.' + vidExt(file.name);
   note('⏳ 讀緊段片（' + kb(file.size) + '）…');
   const buf = await file.arrayBuffer();
   await ffCall({t:'put', name:name, buf:buf}, [buf]);
   const pr = await ffRun(['-hide_banner', '-i', name]);
-  return {name:name, dur:parseDur(pr.logs)};
+  const d = parseDims(pr.logs);
+  const info = {name:name, dur:parseDur(pr.logs), w:d.w, h:d.h};
+  ffFiles.set(file, info);
+  return info;
+}
+function ffDrop(file){
+  const got = ffFiles.get(file); if(!got) return;
+  ffFiles.delete(file);
+  if(ff) ffCall({t:'rm', name:got.name}).catch(function(){});
 }
 function ffProgressNote(note, dur, label){
   return function(s){
@@ -719,13 +765,15 @@ function ffProgressNote(note, dur, label){
 
 /* ---------- 抽格：兩條路出同一樣嘢 [{t, url, w, h, bytes, sig}] ---------- */
 async function extractFrames(file, opt, note, signal){
-  const maxN = opt.maxN, px = opt.px;
+  let maxN = opt.maxN, px = opt.px;
+  const plan = function(dur, w, h){ if(opt.plan){ const p = opt.plan(dur, w, h); maxN = p.maxN; px = p.px; } };
   const nCand = function(dur){ return opt.smart ? Math.min(150, Math.max(maxN, Math.ceil(dur * 2))) : Math.min(maxN, Math.max(1, Math.ceil(dur * 2))); };
   /* ① 原生 */
   let nat = null;
   try{ nat = await nativeOpen(file); }catch(e){ nat = null; }
   if(nat){
     try{
+      plan(nat.dur, nat.w, nat.h);
       const n = nCand(nat.dur), cands = [];
       for(let i = 0; i < n; i++){
         if(signal.aborted) throw abortErr();
@@ -736,13 +784,14 @@ async function extractFrames(file, opt, note, signal){
         cands.push(pic);
         note('⏳ 抽緊格 ' + (i + 1) + '／' + n + '（' + fmtT(t) + '／' + fmtT(nat.dur) + '）');
       }
-      return {frames:pickFrames(cands, maxN, opt.smart, nat.dur), cand:cands.length, dur:nat.dur, w:nat.w, h:nat.h, via:'browser'};
+      return {frames:pickFrames(cands, maxN, opt.smart, nat.dur), cand:cands.length, dur:nat.dur, w:nat.w, h:nat.h, via:'browser', maxN:maxN, px:px};
     }finally{ nativeClose(nat); }
   }
   /* ② ffmpeg */
   const fo = await ffOpen(file, note, signal);
   try{
     const dur = fo.dur || 60;
+    plan(dur, fo.w, fo.h);
     const n = nCand(dur), fps = Math.max(0.01, n / dur);
     note('⏳ 解碼緊…');
     const r = await ffRun(['-hide_banner', '-i', fo.name, '-an', '-sn', '-dn', '-vf', 'fps=' + fps.toFixed(4) + ',' + scaleExpr(px), '-q:v', '4', '-f', 'image2', 'f%05d.jpg'],
@@ -756,8 +805,8 @@ async function extractFrames(file, opt, note, signal){
       pic.t = Math.min(dur, (i + 0.5) / fps); pic.sig = frameSig(bm, bm.width, bm.height);
       bm.close(); cands.push(pic);
     }
-    return {frames:pickFrames(cands, maxN, opt.smart, dur), cand:cands.length, dur:fo.dur, w:cands[0].w, h:cands[0].h, via:'解碼器'};
-  }finally{ if(ff) ffCall({t:'rm', name:fo.name}).catch(function(){}); }
+    return {frames:pickFrames(cands, maxN, opt.smart, dur), cand:cands.length, dur:fo.dur, w:cands[0].w, h:cands[0].h, via:'解碼器', maxN:maxN, px:px};
+  }finally{ ffDrop(file); }
 }
 
 /* ---------- 原片直送：MP4／MOV／MKV 細過 50MB 照送；其他格式或者太大，先喺部機轉做細 MP4 ---------- */
@@ -798,7 +847,202 @@ async function prepareDirect(file, note, signal){
       }catch(e){}
     }
     return {url:await blobToDataUrl(new Blob([f.data]), 'video/mp4'), bytes:f.data.length, dur:dur, poster:poster, conv:true};
-  }finally{ if(ff) ffCall({t:'rm', name:fo.name}).catch(function(){}); }
+  }finally{ ffDrop(file); }
+}
+
+/* ===================================================================
+   估 token、估成本、建議設定
+   GLM-5.3-Flash 視覺部分：patch 14px、2×2 合併 → 大約每 28×28 像素 = 1 個 token。
+   呢個係估算：Z.ai 冇公開實際點計，所以每次真係用完，會用 API 報返嘅數自動校正。
+   =================================================================== */
+const FRAME_OPTS = [12, 24, 40, 80, 120];
+function imgTokens(w, h){ return Math.max(16, Math.round(w / 28) * Math.round(h / 28)) + 4; }
+function fitDims(w, h, px){
+  if(!w || !h){ w = 1920; h = 1080; }
+  const sc = Math.min(1, px / Math.max(w, h));
+  return {w:Math.max(1, Math.round(w * sc)), h:Math.max(1, Math.round(h * sc))};
+}
+function calFactor(){ const c = cfg(); return (c.tokCal > 0.2 && c.tokCal < 5) ? c.tokCal : 1; }
+function costOf(inTok, outTok){ const c = cfg(); return inTok * (+c.priceIn || 0) / 1e6 + outTok * (+c.priceOut || 0) / 1e6; }
+function fmtUSD(x){ return 'US$' + (x < 0.001 ? x.toFixed(5) : x < 0.1 ? x.toFixed(4) : x.toFixed(2)); }
+function sysTokens(o, kind){ return Math.round((buildSystem(o, kind) || '').length * 0.8) + 80; }
+function thinkTokens(){ return {low:1500, high:5000, max:12000}[cfg().effort] || 3000; }
+function calOut(){ const c = cfg(); return (c.tokCalOut > 0.2 && c.tokCalOut < 5) ? c.tokCalOut : 1; }
+function estOutRaw(mode, n){ return thinkTokens() + (mode === 'ocr' ? 200 + 15 * n : mode === 'layout' ? Math.min(6000, 400 + 30 * n) : 800); }
+function estOut(mode, n){ return Math.round(estOutRaw(mode, n) * calOut()); }
+function framesUsed(dur, maxN, smart){
+  const cand = smart ? Math.min(150, Math.max(maxN, Math.ceil(dur * 2))) : Math.min(maxN, Math.max(1, Math.ceil(dur * 2)));
+  return Math.min(maxN, cand);
+}
+/* 建議：按片長同模式揀格數、按內容揀解像度 */
+function recFor(info, mode){
+  const d = info.dur || 60, srcLong = Math.max(info.w || 1920, info.h || 1080);
+  const n = mode === 'ocr' ? (d <= 15 ? 12 : d <= 60 ? 40 : d <= 180 ? 80 : 120)
+                           : (d <= 15 ? 12 : d <= 60 ? 24 : d <= 180 ? 40 : d <= 600 ? 80 : 120);
+  let px = mode === 'ocr' ? 1280 : 1024;
+  const why = [];
+  why.push(mode === 'ocr' ? '抄字幕要密啲，字幕通常幾秒就換' : '描述用，大約每 ' + Math.max(1, Math.round(d / n)) + ' 秒一格已經夠跟到劇情');
+  if(mode !== 'ocr' && d > 600){ px = 768; why.push('長片用 768px 慳返 token'); }
+  if(srcLong <= 800){ px = 768; why.push('原片本身只有 ' + (info.w || '?') + '×' + (info.h || '?') + '，再高都冇用'); }
+  else if(mode === 'ocr') why.push('字幕細字要 1280px 先讀得清');
+  if(d > 600) why.push('超過十分鐘：就算 120 格都要約每 ' + Math.round(d / 120) + ' 秒先一格，太長嘅片建議剪開幾段');
+  return {maxN:n, px:px, why:why};
+}
+function planFor(info, mode, c){
+  const r = recFor(info, mode);
+  return {maxN:c.vMax === 'auto' ? r.maxN : (+c.vMax || 40), px:c.vRes === 'auto' ? r.px : (+c.vRes || 1024)};
+}
+function estFrames(info, o, maxN, px, smart){
+  const n = framesUsed(info.dur || 60, maxN, smart), fd = fitDims(info.w, info.h, px);
+  const per = imgTokens(fd.w, fd.h) + 6;
+  const raw = sysTokens(o, 'frames') + 40 + n * per;
+  return {n:n, low:smart ? Math.max(1, Math.min(n, Math.ceil(n / 3))) : n, per:per, raw:raw, inTok:Math.round(raw * calFactor()), outTok:estOut(o.mode, n), fw:fd.w, fh:fd.h};
+}
+function estDirect(info, o){
+  const d = info.dur || 60, groups = Math.max(1, Math.round(Math.min(d * 2, 640) / 2));
+  const lo = fitDims(info.w, info.h, 448), hi = fitDims(info.w, info.h, 1024);
+  const sys = sysTokens(o, 'direct') + 40;
+  return {lo:sys + groups * imgTokens(lo.w, lo.h), hi:sys + groups * imgTokens(hi.w, hi.h), outTok:estOut(o.mode, Math.min(120, Math.round(d)))};
+}
+function recMethod(info){
+  const ext = vidExt(info.name), d = info.dur || 0;
+  if(/^(mp4|m4v|mov|mkv)$/.test(ext) && d && d <= 60 && info.size <= DIRECT_MAX_BYTES) return {alt:true};
+  return {alt:false};
+}
+
+/* 上載嗰陣即刻量片長、尺寸、整張縮圖 */
+async function probeVideo(it){
+  it.info = {name:it.name, size:it.file.size, dur:0, w:0, h:0, state:'probing', note:'量緊長度…'};
+  renderQueue();
+  try{
+    const nat = await nativeOpen(it.file);
+    try{
+      Object.assign(it.info, {dur:nat.dur, w:nat.w, h:nat.h, via:'browser'});
+      await nativeSeek(nat.v, Math.min(1, nat.dur / 3));
+      it.poster = toJpeg(nat.v, 0, 0, nat.w, nat.h, 240).url;
+    }finally{ nativeClose(nat); }
+  }catch(e){
+    if(location.protocol === 'file:'){ it.info.err = '要用解碼器先量到長度（file:// 開唔到解碼器）'; }
+    else{
+      try{
+        const fo = await ffOpen(it.file, function(m){ it.info.note = m.replace(/^⏳\s*/, ''); renderQueue(); });
+        Object.assign(it.info, {dur:fo.dur, w:fo.w, h:fo.h, via:'解碼器'});
+        const pr = await ffRun(['-hide_banner', '-ss', String(Math.min(1, (fo.dur || 3) / 3)), '-i', fo.name, '-frames:v', '1', '-vf', scaleExpr(240), '-q:v', '5', 'p.jpg']);
+        if(pr.files[0]) it.poster = URL.createObjectURL(new Blob([pr.files[0].data], {type:'image/jpeg'}));
+      }catch(e2){ it.info.err = e2.message; }
+    }
+  }
+  it.info.state = it.info.err ? 'err' : 'ok';
+  if(queue.indexOf(it) < 0){ ffDrop(it.file); return; }   /* 量緊嗰陣俾人剷咗 */
+  renderQueue();
+}
+
+/* 影片設定下面：每段片嘅資料＋建議，同埋成本比較表 */
+function refreshVidAdvice(){
+  const box = $('vidAdvice'), tbl = $('vidCost');
+  if(!box || $('vidBox').hidden){ if(box){ box.innerHTML = ''; tbl.innerHTML = ''; } return; }
+  const c = cfg(), o = currentOpts(), smart = $('vSmart').checked;
+  const vids = queue.filter(function(q){ return q.kind === 'video'; });
+  box.innerHTML = '';
+  const ready = vids.filter(function(v){ return v.info && v.info.state === 'ok'; });
+  vids.forEach(function(v){
+    const d = document.createElement('div'); d.className = 'vi';
+    const im = document.createElement('img'); im.alt = ''; if(v.poster) im.src = v.poster; d.appendChild(im);
+    const t = document.createElement('div');
+    const b = document.createElement('b');
+    const inf = v.info || {};
+    if(inf.state === 'ok'){
+      b.textContent = v.name + ' · ' + fmtT(inf.dur) + (inf.w ? ' · ' + inf.w + '×' + inf.h : '') + ' · ' + kb(v.file.size);
+      const rc = recFor(inf, o.mode), pl = planFor(inf, o.mode, c);
+      const w = document.createElement('div'); w.className = 'why';
+      w.textContent = '建議：最多 ' + rc.maxN + ' 格、' + rc.px + 'px（' + rc.why.join('；') + '）'
+        + ((pl.maxN !== rc.maxN || pl.px !== rc.px) ? '。而家用緊：' + pl.maxN + ' 格、' + pl.px + 'px。' : '。')
+        + (inf.via === '解碼器' ? ' 呢個格式要用解碼器，抽格會慢少少。' : '');
+      t.append(b, w);
+    }else{
+      b.textContent = v.name + ' · ' + kb(v.file.size);
+      const w = document.createElement('div'); w.className = 'why';
+      w.textContent = inf.state === 'err' ? ('⚠ 量唔到長度：' + inf.err + '（照樣可以分析，會用預設 40 格估）') : ('⏳ ' + (inf.note || '量緊長度…'));
+      t.append(b, w);
+    }
+    d.appendChild(t); box.appendChild(d);
+  });
+  /* 送法建議 */
+  const anyAlt = ready.some(function(v){ return recMethod(v.info).alt; });
+  const rec = document.createElement('div'); rec.className = 'rec';
+  rec.innerHTML = '<b>點樣送：建議用「抽格分析」</b>（「自動」就係揀呢個）'
+    + '<ul><li>咩格式都得，AVI、WMV 都冇問題</li><li>事前估得到用幾多 token，可以自己控制成本</li>'
+    + '<li>每格都有準確時間，時間線唔會亂</li><li>Z.ai 未確認收唔收直接上載嘅影片；抽格就一定得</li></ul>'
+    + (anyAlt ? '<div class="why" style="margin-top:6px">💡 你有一分鐘以內嘅 MP4／MOV：如果重點係<b>連續動作</b>（跳舞、運動、示範手勢），可以試「原片直送」，AI 會睇到動作過程。唔得會自動轉返抽格，唔會白蝕。</div>'
+             : '<div class="why" style="margin-top:6px">「原片直送」只係建議用喺一分鐘以內、重點係連續動作嘅 MP4／MOV。</div>');
+  box.appendChild(rec);
+
+  /* 成本比較表 */
+  tbl.innerHTML = '';
+  if(!vids.length) return;
+  const infos = vids.map(function(v){ return (v.info && v.info.state === 'ok') ? v.info : {name:v.name, size:v.file.size, dur:60, w:0, h:0}; });
+  const rows = [{key:'auto', label:'自動（每段按片長建議）'}].concat(FRAME_OPTS.map(function(n){ return {key:String(n), label:'最多 ' + n + ' 格'}; }));
+  const curMethod = $('vMethod').value;
+  const wrap = document.createElement('div'); wrap.className = 'costwrap';
+  const h = document.createElement('h3');
+  h.textContent = '💰 預計用量' + (vids.length > 1 ? '（' + vids.length + ' 段片合計）' : '') + '　撳一行就揀嗰個';
+  wrap.appendChild(h);
+  const table = document.createElement('table'); table.className = 'cost';
+  table.innerHTML = '<thead><tr><th>選擇</th><th>送幾多格' + (vids.length > 1 ? '（合計）' : '') + '</th><th>輸入 token</th><th>輸出 token</th><th>大約成本</th></tr></thead>';
+  const tb = document.createElement('tbody');
+  let selCost = 0, selRow = null;
+  rows.forEach(function(row){
+    let n = 0, lo = 0, inT = 0, outT = 0;
+    infos.forEach(function(inf){
+      const rc = recFor(inf, o.mode);
+      const maxN = row.key === 'auto' ? rc.maxN : +row.key;
+      const px = c.vRes === 'auto' ? rc.px : +c.vRes;
+      const e = estFrames(inf, o, maxN, px, smart);
+      n += e.n; lo += e.low; inT += e.inTok; outT += e.outTok;
+    });
+    const cost = costOf(inT, outT);
+    const tr = document.createElement('tr');
+    if(curMethod !== 'direct' && c.vMax === row.key){ tr.className = 'sel'; selCost = cost; selRow = row; }
+    if(row.key === 'auto') tr.className += ' rec';
+    tr.innerHTML = '<td>' + row.label + '</td><td>' + (smart && lo < n ? lo + '–' + n : n) + '</td><td>' + n0(inT) + '</td><td>' + n0(outT) + '</td><td>' + fmtUSD(cost) + '</td>';
+    tr.onclick = function(){ $('vMax').value = row.key; cfgPatch('vMax', row.key); if($('vMethod').value === 'direct'){ $('vMethod').value = 'auto'; cfgPatch('vMethod', 'auto'); } refreshVidAdvice(); refreshPromptUI(); };
+    tb.appendChild(tr);
+  });
+  /* 原片直送：粗略 */
+  let dlo = 0, dhi = 0, dout = 0;
+  infos.forEach(function(inf){ const e = estDirect(inf, o); dlo += e.lo; dhi += e.hi; dout += e.outTok; });
+  const trd = document.createElement('tr');
+  if(curMethod === 'direct'){ trd.className = 'sel'; selCost = costOf(dhi, dout); }
+  trd.innerHTML = '<td>原片直送（好粗略）</td><td>AI 自己抽</td><td>' + n0(dlo) + '–' + n0(dhi) + '</td><td>' + n0(dout) + '</td><td>' + fmtUSD(costOf(dlo, dout)) + '–' + fmtUSD(costOf(dhi, dout)) + '</td>';
+  trd.onclick = function(){ $('vMethod').value = 'direct'; cfgPatch('vMethod', 'direct'); refreshVidAdvice(); refreshPromptUI(); };
+  tb.appendChild(trd);
+  table.appendChild(tb); wrap.appendChild(table);
+  /* 解像度比較（用而家揀嘅格數） */
+  const resLine = document.createElement('div'); resLine.className = 'note';
+  resLine.textContent = '每格解像度比較（同樣格數）：' + [768, 1024, 1280].map(function(px){
+    let inT = 0, outT = 0;
+    infos.forEach(function(inf){
+      const rc = recFor(inf, o.mode), maxN = c.vMax === 'auto' ? rc.maxN : +c.vMax;
+      const e = estFrames(inf, o, maxN, px, smart); inT += e.inTok; outT += e.outTok;
+    });
+    return px + 'px ≈ ' + fmtUSD(costOf(inT, outT));
+  }).join('　');
+  wrap.appendChild(resLine);
+  const nt = document.createElement('div'); nt.className = 'note';
+  const cal = cfg();
+  nt.textContent = '點估：每 28×28 像素大約 1 個 token；輸出包埋 AI 思考（思考深淺 ' + (cal.effort || '預設') + ' 約 ' + n0(thinkTokens()) + ' token）。'
+    + (smart ? '開咗智能揀格，畫面變化少嘅片實際格數會少啲，所以「送幾多格」寫咗範圍，token 同成本係按最多嗰個估。' : '')
+    + '價錢：輸入 US$' + (+cal.priceIn) + '、輸出 US$' + (+cal.priceOut) + '／每百萬 token（⚙ 可以改）。'
+    + (cal.tokCalN ? '已經按你之前 ' + cal.tokCalN + ' 次實際用量校正過（輸入 ×' + calFactor().toFixed(2) + '、輸出 ×' + calOut().toFixed(2) + '）。' : '用過幾次之後，會按 API 報返嘅實際用量自動校正。')
+    + (selCost > 0 ? '　而家揀嗰個：US$1 大約夠做 ' + n0(Math.floor(1 / selCost)) + ' 次。' : '');
+  wrap.appendChild(nt);
+  tbl.appendChild(wrap);
+}
+function refreshResNote(){
+  const px = +$('res').value || 1600;
+  const a4 = fitDims(2480, 3508, px), ph = fitDims(4000, 3000, px);
+  const ta4 = imgTokens(a4.w, a4.h), tph = imgTokens(ph.w, ph.h);
+  $('resNote').textContent = '估計：A4 一版約 ' + n0(ta4) + ' token（' + fmtUSD(costOf(ta4 + 900, thinkTokens() + 600)) + '／版），4:3 相片約 ' + n0(tph) + ' token。';
 }
 
 /* ===================================================================
@@ -826,6 +1070,8 @@ async function addFiles(files){
         });
     }else if(kind === 'image'){
       it.url = URL.createObjectURL(f);
+    }else if(kind === 'video'){
+      probeVideo(it);
     }
   }
   if(queue.some(function(q){ return q.kind === 'video'; }) && !$('vidBox').dataset.seen){
@@ -839,7 +1085,7 @@ function renderQueue(){
   queue.forEach(function(it){
     const d = document.createElement('div'); d.className = 'qi';
     const th = document.createElement('div'); th.className = 'th';
-    if(it.url){ th.style.backgroundImage = 'url("' + it.url + '")'; th.setAttribute('role', 'img'); th.setAttribute('aria-label', '圖片：' + it.name); }
+    if(it.url || it.poster){ th.style.backgroundImage = 'url("' + (it.url || it.poster) + '")'; th.setAttribute('role', 'img'); th.setAttribute('aria-label', (it.kind === 'video' ? '影片：' : '圖片：') + it.name); }
     else{
       th.textContent = it.err ? '⚠️' : (it.kind === 'pdf' ? '📄' : it.kind === 'video' ? '🎬' : '🖼');
       const sm = document.createElement('small');
@@ -848,7 +1094,9 @@ function renderQueue(){
     }
     d.appendChild(th);
     const nm = document.createElement('div'); nm.className = 'nm'; nm.title = it.name;
-    nm.textContent = it.kind === 'pdf' ? (it.err ? it.err : it.loading ? '讀緊…' : it.pages + ' 版 · ' + it.name) : it.name;
+    nm.textContent = it.kind === 'pdf' ? (it.err ? it.err : it.loading ? '讀緊…' : it.pages + ' 版 · ' + it.name)
+                   : it.kind === 'video' ? ((it.info && it.info.state === 'ok') ? '⏱ ' + fmtT(it.info.dur) + ' · ' + it.name : (it.info && it.info.state === 'err') ? '⚠ ' + it.name : '量緊… ' + it.name)
+                   : it.name;
     d.appendChild(nm);
     if(it.kind === 'pdf' && !it.loading && !it.err){
       const inp = document.createElement('input'); inp.type = 'text';
@@ -865,9 +1113,11 @@ function renderQueue(){
   });
   $('vidBox').hidden = !queue.some(function(q){ return q.kind === 'video'; });
   refreshPromptUI();
+  refreshVidAdvice();
 }
 function dropItem(it, destroy){
   if(it.url) URL.revokeObjectURL(it.url);
+  if(destroy && it.kind === 'video') ffDrop(it.file);
   if(destroy && it.doc) try{ it.doc.destroy(); }catch(e){}
   queue = queue.filter(function(q){ return q !== it; });
   renderQueue();
@@ -1406,9 +1656,22 @@ async function ask(r, o, signal, allowFallback){
     if(res.finish === 'length') text += '\n\n【⚠ 去到輸出上限，後面未寫完。可以喺 ⚙ 設定加大「輸出上限」再撳 🔁 重做。】';
     if(!text) throw new Error('AI 回咗空白。' + (res.reason ? '（佢諗咗 ' + n0(res.reason.length) + ' 字但冇出答案，多數係輸出上限太細）' : ''));
     r.ta.value = text; autoGrow(r.ta); r.think.hidden = true;
+    const u = res.usage;
+    if(u && u.prompt_tokens && r.kind === 'frames' && r.estRaw){
+      /* 用實際用量校正之後嘅估算（只係一個數，唔包任何內容） */
+      const ratio = Math.max(0.2, Math.min(5, u.prompt_tokens / r.estRaw));
+      const cc = cfg(); const n = (cc.tokCalN || 0);
+      cc.tokCal = n ? (cc.tokCal * 0.7 + ratio * 0.3) : ratio; cc.tokCalN = n + 1;
+      if(u.completion_tokens){
+        const ro = Math.max(0.2, Math.min(5, u.completion_tokens / estOutRaw(o.mode, r.frames.length)));
+        cc.tokCalOut = n ? ((cc.tokCalOut || 1) * 0.7 + ro * 0.3) : ro;
+      }
+      cfgSave(cc);
+    }
     r.st.textContent = '✅ 完成 · ' + n0(text.length) + ' 字 · ' + Math.round((Date.now() - t0) / 1000) + ' 秒'
       + (r.meta ? ' · ' + r.meta : '')
-      + (res.usage ? ' · ' + n0(res.usage.prompt_tokens || 0) + ' → ' + n0(res.usage.completion_tokens || 0) + ' token' : '');
+      + (u ? ' · ' + n0(u.prompt_tokens || 0) + ' → ' + n0(u.completion_tokens || 0) + ' token · ' + fmtUSD(costOf(u.prompt_tokens || 0, u.completion_tokens || 0))
+           + (r.kind === 'frames' && r.estRaw ? '（預計輸入 ' + n0(r.estRaw) + '）' : '') : '');
     return true;
   }catch(err){
     r.think.hidden = true;
@@ -1428,7 +1691,7 @@ async function processVideo(r, o, signal){
   r.ta.value = ''; r.frames = null; r.video = null; renderStrip(r);
   let fellBack = '';
   try{
-    if(c.vMethod === 'direct'){
+    if(c.vMethod === 'direct'){   /* 「自動」同「抽格」都係行抽格 */
       const d = await prepareDirect(r.file, note, signal);
       r.kind = 'direct'; r.video = d.url; r.dur = d.dur;
       if(d.poster) setThumb(r, d.poster.url);
@@ -1440,12 +1703,14 @@ async function processVideo(r, o, signal){
       note('⚠ 原片直送唔得（' + fellBack + '），自動轉做抽格分析…');
       await sleep(1200, signal);
     }
-    const ex = await extractFrames(r.file, {maxN:+c.vMax || 40, px:+c.vRes || 1024, smart:c.vSmart !== false}, note, signal);
+    const ex = await extractFrames(r.file, {maxN:40, px:1024, smart:c.vSmart !== false,
+      plan:function(dur, w, h){ return planFor({dur:dur, w:w, h:h}, o.mode, c); }}, note, signal);
     if(!ex.frames.length) throw new Error('抽唔到任何畫面。');
     r.kind = 'frames'; r.frames = ex.frames; r.dur = ex.dur;
+    r.estRaw = sysTokens(o, 'frames') + 40 + ex.frames.reduce(function(a, f){ return a + imgTokens(f.w, f.h) + 6; }, 0);
     setThumb(r, ex.frames[0].url); renderStrip(r);
     const bytes = ex.frames.reduce(function(a, f){ return a + f.bytes; }, 0);
-    r.meta = ex.frames.length + ' 格' + (ex.cand > ex.frames.length ? '（由 ' + ex.cand + ' 格揀出）' : '') + ' · ' + fmtT(ex.dur)
+    r.meta = '最多 ' + ex.maxN + ' 格 → 用咗 ' + ex.frames.length + ' 格' + (ex.cand > ex.frames.length ? '（由 ' + ex.cand + ' 格候選揀出）' : '') + ' · ' + fmtT(ex.dur)
            + ' · ' + ex.frames[0].w + '×' + ex.frames[0].h + ' · ' + kb(bytes) + ' · 經' + ex.via + (fellBack ? ' · 原片直送唔得，改咗抽格' : '');
     return await ask(r, o, signal);
   }catch(e){
@@ -1626,19 +1891,19 @@ document.addEventListener('paste', function(e){
   $('lang').value = LANGS[c.lang] ? c.lang : DEF.lang;
   $('res').value = String(c.res || DEF.res);
   $('slice').checked = c.slice !== false;
-  $('vMethod').value = c.vMethod === 'direct' ? 'direct' : 'frames';
+  $('vMethod').value = /^(auto|frames|direct)$/.test(c.vMethod) ? c.vMethod : 'auto';
   $('vMax').value = String(c.vMax || DEF.vMax); if(!$('vMax').value) $('vMax').value = DEF.vMax;
   $('vRes').value = String(c.vRes || DEF.vRes); if(!$('vRes').value) $('vRes').value = DEF.vRes;
   $('vSmart').checked = c.vSmart !== false;
-  $('vMethod').onchange = function(){ cfgPatch('vMethod', $('vMethod').value); refreshPromptUI(); };
-  $('vMax').onchange = function(){ cfgPatch('vMax', $('vMax').value); };
-  $('vRes').onchange = function(){ cfgPatch('vRes', $('vRes').value); };
-  $('vSmart').onchange = function(){ cfgPatch('vSmart', $('vSmart').checked); };
+  $('vMethod').onchange = function(){ cfgPatch('vMethod', $('vMethod').value); refreshPromptUI(); refreshVidAdvice(); };
+  $('vMax').onchange = function(){ cfgPatch('vMax', $('vMax').value); refreshVidAdvice(); };
+  $('vRes').onchange = function(){ cfgPatch('vRes', $('vRes').value); refreshVidAdvice(); };
+  $('vSmart').onchange = function(){ cfgPatch('vSmart', $('vSmart').checked); refreshVidAdvice(); };
   document.querySelectorAll('input[name=mode]').forEach(function(x){
-    x.onchange = function(){ cfgPatch('mode', x.value); refreshPromptUI(); };
+    x.onchange = function(){ cfgPatch('mode', x.value); refreshPromptUI(); refreshVidAdvice(); };
   });
-  $('lang').onchange = function(){ cfgPatch('lang', $('lang').value); refreshPromptUI(); };
-  $('res').onchange = function(){ cfgPatch('res', $('res').value); };
+  $('lang').onchange = function(){ cfgPatch('lang', $('lang').value); refreshPromptUI(); refreshVidAdvice(); };
+  $('res').onchange = function(){ cfgPatch('res', $('res').value); refreshResNote(); };
   $('slice').onchange = function(){ cfgPatch('slice', $('slice').checked); };
   $('extra').addEventListener('input', refreshPromptUI);
 })();
@@ -1648,6 +1913,7 @@ function openCfg(){
   const c = cfg();
   $('cBase').value = c.base; $('cKey').value = c.key || ''; $('cRemember').checked = c.remember !== false;
   $('cModel').value = c.model; $('cEffort').value = c.effort; $('cMax').value = c.maxTok; $('cTestOut').textContent = '';
+  $('cPriceIn').value = c.priceIn; $('cPriceOut').value = c.priceOut;
   $('dlgCfg').showModal();
 }
 function readCfgForm(){
@@ -1655,11 +1921,13 @@ function readCfgForm(){
   c.base = $('cBase').value.trim(); c.key = $('cKey').value.trim(); c.remember = $('cRemember').checked;
   c.model = $('cModel').value.trim(); c.effort = $('cEffort').value;
   c.maxTok = Math.max(1000, Math.min(128000, parseInt($('cMax').value, 10) || DEF.maxTok));
+  const pi = parseFloat($('cPriceIn').value), po = parseFloat($('cPriceOut').value);
+  c.priceIn = pi >= 0 ? pi : DEF.priceIn; c.priceOut = po >= 0 ? po : DEF.priceOut;
   return c;
 }
 $('btnCfg').onclick = openCfg;
 $('cCancel').onclick = function(){ $('dlgCfg').close(); };
-$('cSave').onclick = function(){ cfgSave(readCfgForm()); $('dlgCfg').close(); toast('已儲存設定'); setStatus(''); };
+$('cSave').onclick = function(){ cfgSave(readCfgForm()); $('dlgCfg').close(); toast('已儲存設定'); setStatus(''); refreshVidAdvice(); refreshResNote(); };
 $('cKeyShow').onclick = function(){ const k = $('cKey'); k.type = k.type === 'password' ? 'text' : 'password'; };
 $('cWipe').onclick = function(){
   if(!confirm('清除呢部機上呢個 app 嘅所有設定（包括 API Key）同你存嘅模板？')) return;
@@ -1699,6 +1967,7 @@ $('zoom').onclick = function(){ $('zoom').close(); };
 
 renderTpls();
 refreshPromptUI();
+refreshResNote();
 if(!cfgReady()) setStatus('第一次用：先撳右上角「⚙ 設定」填中轉站嘅 Base URL。');
 })();
 </script>
