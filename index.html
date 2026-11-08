@@ -119,7 +119,22 @@ table.cost tr.rec td:first-child::after{content:' ⭐';}
 body.quick #quickUI{display:block}
 body.quick .wrap > :not(header):not(#quickUI){display:none !important}
 header .btn[hidden]{display:none}
-.q-cam{position:relative;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:4/3;max-height:46vh;margin:0 auto 12px;width:100%}
+.q-cam{position:relative;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:4/3;width:min(100%, calc(64vh * 4 / 3));margin:0 auto 12px}
+@media (orientation:portrait){ .q-cam{aspect-ratio:3/4;width:min(100%, calc(58vh * 3 / 4))} }
+.cam-fs{position:absolute;top:8px;right:8px;z-index:3;width:44px;height:44px;border-radius:10px;border:0;background:rgba(0,0,0,.45);color:#fff;font-size:22px;cursor:pointer;line-height:1}
+.cam-flash{position:absolute;left:8px;bottom:8px;width:30%;max-width:170px;border:3px solid #fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.6);z-index:3;transition:opacity .5s;pointer-events:none}
+/* 全螢幕影相：鏡頭畫面佔晒上面，掣擺喺下面黑色位，唔會遮住要影嘅範圍 */
+.camfs::before{content:'';position:fixed;inset:0;background:#000;z-index:59}
+.camfs .q-cam{position:fixed;left:0;right:0;top:0;width:100vw;height:calc(100vh - 128px);height:calc(100dvh - 128px - env(safe-area-inset-bottom));max-height:none;aspect-ratio:auto;border-radius:0;margin:0;z-index:60}
+.camfs .q-btns{position:fixed;left:10px;right:10px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:61}
+.camfs .q-btns .qb{min-height:96px;background:#222;color:#fff;border-color:#555}
+.camfs .q-btns #qShot,.camfs .q-btns #sShot{background:var(--acc);border-color:var(--acc)}
+.camfs .q-btns .qb.rec{background:#c62828;border-color:#c62828}
+@media (orientation:landscape){
+  .camfs .q-cam{right:150px;width:auto;height:100vh;height:100dvh}
+  .camfs .q-btns{left:auto;right:calc(8px + env(safe-area-inset-right));top:8px;bottom:8px;width:134px;grid-template-columns:1fr;grid-auto-rows:1fr}
+  .camfs .q-btns .qb{min-height:0}
+}
 .q-cam video{width:100%;height:100%;object-fit:cover;display:block}
 .q-cammsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ddd;font-size:15px;text-align:center;padding:16px}
 .q-cammsg[hidden]{display:none}
@@ -218,6 +233,7 @@ body.story .wrap > :not(header):not(#storyUI){display:none !important}
   <section id="quickUI" aria-label="隨身口述模式">
     <div class="q-cam">
       <video id="qVideo" playsinline muted autoplay aria-hidden="true"></video>
+      <button class="cam-fs" type="button" data-scope="quickUI" aria-label="全螢幕影相">⛶</button>
       <div id="qCamMsg" class="q-cammsg">鏡頭未開</div>
       <div id="qRec" class="q-rec" hidden aria-hidden="true">● 錄緊 <span id="qRecT">0</span> 秒</div>
     </div>
@@ -281,7 +297,7 @@ body.story .wrap > :not(header):not(#storyUI){display:none !important}
       </div>
       <div class="go"><button class="btn" id="sCapBtn" type="button">📷 用鏡頭逐版影書</button></div>
       <div id="sCap" class="s-cap" hidden>
-        <div class="q-cam"><video id="sVideo" playsinline muted autoplay aria-hidden="true"></video><div id="sCamMsg" class="q-cammsg">鏡頭未開</div></div>
+        <div class="q-cam"><video id="sVideo" playsinline muted autoplay aria-hidden="true"></video><button class="cam-fs" type="button" data-scope="sCap" aria-label="全螢幕影相">⛶</button><div id="sCamMsg" class="q-cammsg">鏡頭未開</div></div>
         <div class="q-btns">
           <button class="qb" id="sShotCover" type="button" aria-label="影封面，AI 會認出書名同作者"><i aria-hidden="true">📕</i><span>影封面</span></button>
           <button class="qb" id="sShot" type="button" aria-label="影下一版，一版或者左右兩版都得"><i aria-hidden="true">📷</i><span id="sShotLbl">影下一版</span></button>
@@ -922,13 +938,46 @@ function nativeClose(n){
 }
 
 /* 每格嘅「指紋」：縮到 32×18 灰階，用嚟比較兩格似唔似 */
-function frameSig(src, w, h){
+function frameSig(src, w, h, rc){
   const c = newCanvas(32, 18), cx = c.getContext('2d', {willReadFrequently:true});
-  cx.drawImage(src, 0, 0, w, h, 0, 0, 32, 18);
+  if(rc) cx.drawImage(src, rc.x, rc.y, rc.w, rc.h, 0, 0, 32, 18);
+  else cx.drawImage(src, 0, 0, w, h, 0, 0, 32, 18);
   const d = cx.getImageData(0, 0, 32, 18).data, g = new Uint8Array(576);
   for(let i = 0; i < 576; i++) g[i] = (d[i * 4] * 3 + d[i * 4 + 1] * 6 + d[i * 4 + 2]) / 10;
   return g;
 }
+/* 預覽框見到幾多就影幾多：預覽用「填滿」顯示會裁走鏡頭畫面嘅邊，影相時照樣裁走 */
+function camVisibleRect(v){
+  const vw = v.videoWidth, vh = v.videoHeight, r = v.getBoundingClientRect();
+  if(!vw || !vh || !r.width || !r.height) return {x:0, y:0, w:vw, h:vh};
+  if(getComputedStyle(v).objectFit !== 'cover') return {x:0, y:0, w:vw, h:vh};
+  const sc = Math.max(r.width / vw, r.height / vh);
+  const cw = Math.min(vw, r.width / sc), ch = Math.min(vh, r.height / sc);
+  return {x:(vw - cw) / 2, y:(vh - ch) / 2, w:cw, h:ch};
+}
+function camGrab(v, px){
+  const rc = camVisibleRect(v);
+  const pic = toJpeg(v, rc.x, rc.y, rc.w, rc.h, px);
+  pic.rect = rc;
+  return pic;
+}
+/* 影完喺角落彈出啱啱影咗嘅相，一眼核對 */
+function camFlash(v, url){
+  const box = v.parentNode; if(!box) return;
+  const old = box.querySelector('.cam-flash'); if(old) old.remove();
+  const im = document.createElement('img'); im.className = 'cam-flash'; im.src = url; im.alt = '啱啱影咗嘅相';
+  box.appendChild(im);
+  setTimeout(function(){ im.style.opacity = '0'; setTimeout(function(){ im.remove(); }, 600); }, 1800);
+}
+function camFsSet(scopeId, on){
+  const el = $(scopeId); if(!el) return;
+  el.classList.toggle('camfs', on);
+  el.querySelectorAll('.cam-fs').forEach(function(b){ b.textContent = on ? '✕' : '⛶'; b.setAttribute('aria-label', on ? '離開全螢幕' : '全螢幕影相'); });
+}
+document.querySelectorAll('.cam-fs').forEach(function(b){
+  b.onclick = function(){ const id = b.dataset.scope; camFsSet(id, !$(id).classList.contains('camfs')); };
+});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ camFsSet('quickUI', false); camFsSet('sCap', false); } });
 function sigDiff(a, b){ let s = 0; for(let i = 0; i < a.length; i++) s += Math.abs(a[i] - b[i]); return s / a.length / 255; }
 
 /* 智能揀格：畫面有明顯變化先揀；靜止太耐都會補一格，等時間線唔會斷；超過上限就逐步收緊 */
@@ -2461,6 +2510,7 @@ async function qCamStart(){
   }
 }
 function qCamStop(){
+  camFsSet('quickUI', false);
   if(qStream){ qStream.getTracks().forEach(function(t){ t.stop(); }); qStream = null; }
   $('qVideo').srcObject = null; $('qCamMsg').hidden = false; $('qCamMsg').textContent = '鏡頭已經熄咗';
   if(qWake){ try{ qWake.release(); }catch(e){} qWake = null; }
@@ -2567,7 +2617,8 @@ $('qShot').onclick = async function(){
   if(qBusy){ ttsCue('仲睇緊上一張'); return; }
   if(!qLive() && !(await qCamStart() && qLive())){ $('qCapPhoto').click(); return; }
   const v = $('qVideo');
-  const pic = toJpeg(v, 0, 0, v.videoWidth, v.videoHeight, qPx());
+  const pic = camGrab(v, qPx());
+  camFlash(v, pic.url);
   ttsReset(); beep(880, 120); ttsCue($('qAsk').value.trim() ? '影咗，搵緊答案' : '影咗，睇緊');
   qDescribe({kind:'image', img:pic.url, w:pic.w, h:pic.h, title:'影相 ' + new Date().toLocaleTimeString('zh-HK', {hour:'2-digit', minute:'2-digit'})});
 };
@@ -2577,13 +2628,14 @@ let qRecState = null;
 const Q_REC_MAX = 60;
 function qRecStart(){
   const v = $('qVideo');
-  qRecState = {t0:performance.now(), cands:[], w:v.videoWidth, h:v.videoHeight};
+  const rc0 = camVisibleRect(v);
+  qRecState = {t0:performance.now(), cands:[], w:Math.round(rc0.w), h:Math.round(rc0.h)};
   const grab = function(){
     if(!qRecState) return;
     const t = (performance.now() - qRecState.t0) / 1000;
     try{
-      const pic = toJpeg(v, 0, 0, v.videoWidth, v.videoHeight, 1024);
-      pic.t = t; pic.sig = frameSig(v, v.videoWidth, v.videoHeight);
+      const pic = camGrab(v, 1024);
+      pic.t = t; pic.sig = frameSig(v, v.videoWidth, v.videoHeight, pic.rect);
       qRecState.cands.push(pic);
     }catch(e){}
     $('qRecT').textContent = Math.floor(t);
@@ -3067,6 +3119,7 @@ async function sCamStart(){
   }
 }
 function sCamStop(){
+  camFsSet('sCap', false);
   if(sStream){ sStream.getTracks().forEach(function(t){ t.stop(); }); sStream = null; }
   $('sVideo').srcObject = null; $('sCamMsg').hidden = false; $('sCamMsg').textContent = '鏡頭已經熄咗';
   if(story.wake){ try{ story.wake.release(); }catch(e){} story.wake = null; }
@@ -3121,7 +3174,9 @@ async function sShoot(asCover){
   if(!sStream || !v.videoWidth){
     if(!(await sCamStart()) || !v.videoWidth){ story.capCover = asCover; $('sCapFile').click(); return; }
   }
-  storyAddShot(toJpeg(v, 0, 0, v.videoWidth, v.videoHeight, 1600), asCover);
+  const pic = camGrab(v, 1600);
+  camFlash(v, pic.url);
+  storyAddShot(pic, asCover);
 }
 async function storyAddFile(file, asCover){
   if(!file) return;
