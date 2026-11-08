@@ -118,11 +118,15 @@ table.cost tr.rec td:first-child::after{content:' ⭐';}
 #quickUI{display:none}
 body.quick #quickUI{display:block}
 body.quick .wrap > :not(header):not(#quickUI){display:none !important}
+header .btn[hidden]{display:none}
 .q-cam{position:relative;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:4/3;max-height:46vh;margin:0 auto 12px;width:100%}
 .q-cam video{width:100%;height:100%;object-fit:cover;display:block}
 .q-cammsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ddd;font-size:15px;text-align:center;padding:16px}
 .q-cammsg[hidden]{display:none}
-@media (max-width:480px){ header h1 small{display:none} header .btn{padding:8px 10px} }
+@media (max-width:480px){ header h1 small{display:none} header .btn{padding:8px 10px} header .hl{display:none} header .btn{font-size:20px} }
+#storyUI{display:none}
+body.story #storyUI{display:block}
+body.story .wrap > :not(header):not(#storyUI){display:none !important}
 .q-rec{position:absolute;top:10px;left:10px;background:#c62828;color:#fff;border-radius:16px;padding:3px 10px;font-size:14px;font-weight:600}
 .q-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .qb{appearance:none;border:2px solid var(--acc);background:var(--card);color:var(--ink);border-radius:16px;min-height:96px;font:inherit;font-size:17px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px}
@@ -142,13 +146,63 @@ body.quick .wrap > :not(header):not(#quickUI){display:none !important}
 .q-warn{margin-top:12px;text-align:center}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:420px){ .qb{min-height:88px;font-size:15px} .q-ctl{grid-template-columns:1fr 1fr} }
+/* ---------- 追問 ---------- */
+.fu{margin-top:14px}
+.fu .chips .tg{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:10px;padding:4px 8px 4px 4px;background:var(--card);cursor:pointer;font:inherit;font-size:13px;color:var(--ink);min-height:44px}
+.fu .chips .tg img{width:40px;height:40px;object-fit:cover;border-radius:6px}
+.fu .chips .tg[aria-pressed="true"]{border-color:var(--acc);background:var(--acc2);font-weight:600}
+.fu-thread{margin-top:8px}
+.fu-thread .qa{border-top:1px solid var(--line);padding:8px 0}
+.fu-thread .q{font-weight:600}
+.fu-thread .a{white-space:pre-wrap;line-height:1.7;margin-top:4px;font-size:16px}
+.fu-thread .m{font-size:12px;color:var(--sub)}
+.fu-in{display:flex;gap:8px;margin-top:8px;align-items:stretch}
+.fu-in textarea{flex:1;font-size:16px;min-height:52px;resize:vertical}
+.fu-in .btn{min-width:70px;font-size:17px}
+/* ---------- 講故事 ---------- */
+.s-spread{display:flex;gap:4px;justify-content:center;align-items:flex-start;background:var(--bg);border-radius:10px;padding:6px;touch-action:pan-y}
+.s-spread .pg{margin:0;position:relative;flex:0 1 auto;max-width:100%}
+.s-spread.two .pg{flex:1 1 0;max-width:50%;cursor:pointer;opacity:.8}
+.s-spread.two .pg.cur{opacity:1;outline:3px solid var(--acc);outline-offset:-3px;cursor:default}
+.s-spread img{display:block;max-width:100%;max-height:64vh;margin:0 auto;object-fit:contain;background:#fff;min-height:120px;min-width:80px}
+.s-spread.two img{width:100%}
+.s-spread figcaption{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:12px;background:rgba(0,0,0,.55);color:#fff;border-radius:10px;padding:0 8px}
+.s-bar2{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.s-ctl{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.s-ctl .btn{min-height:50px;font-size:15px;padding:6px}
+.s-ctl.rtl #sNext{order:-1}
+.s-ctl.rtl #sPrev{order:10}
+@media (max-width:520px){ .s-ctl{grid-template-columns:1fr 1fr 1fr} .s-ctl #sPrev,.s-ctl #sNext{grid-row:2} }
+.s-start{display:flex;align-items:center;gap:6px;font-size:15px;white-space:nowrap}
+.s-start input{width:72px;text-align:center}
+.s-batch{margin-top:10px}
+.s-batch-row{display:flex;gap:8px;align-items:center;margin-top:6px}
+.s-info{display:flex;gap:8px;align-items:center;margin-top:8px}
+.s-cap{margin-top:10px}
+.s-h3{font-size:15px;margin:14px 0 4px}
+.s-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scroll-snap-type:x proximity}
+.st-item{flex:none;width:88px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);padding:4px;cursor:pointer;font:inherit;font-size:11.5px;color:var(--ink);text-align:center;scroll-snap-align:start}
+.st-item img,.st-item .ph{width:78px;height:78px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;background:var(--bg)}
+.st-item .ph{display:flex;align-items:center;justify-content:center;font-size:26px}
+.st-item.sel{border-color:var(--acc);background:var(--acc2)}
+.st-item.cur{box-shadow:0 0 0 3px var(--acc)}
+.st-item .lb2{display:block;margin-top:3px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-item .sq{display:block;color:var(--sub);font-size:10.5px}
+.s-selbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
+.s-start select{width:auto;max-width:56vw}
+.q-ask{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:12px}
+.q-ask .fu-in{margin-top:4px}
+.q-ask input{font-size:17px}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>👁 睇圖 <small>GLM Vision · 圖片／PDF 轉文字</small></h1>
-    <button class="btn" id="btnQuick" type="button">🦯 隨身口述</button>
+    <button class="btn" id="btnFull" type="button" hidden aria-label="完整版">🗂<span class="hl"> 完整版</span></button>
+    <button class="btn" id="btnQuick" type="button" aria-label="隨身口述">🦯<span class="hl"> 隨身口述</span></button>
+    <button class="btn" id="btnStory" type="button" aria-label="講故事">📖<span class="hl"> 講故事</span></button>
     <button class="btn" id="btnCfg" aria-haspopup="dialog">⚙ 設定</button>
   </header>
 
@@ -158,6 +212,14 @@ body.quick .wrap > :not(header):not(#quickUI){display:none !important}
       <video id="qVideo" playsinline muted autoplay aria-hidden="true"></video>
       <div id="qCamMsg" class="q-cammsg">鏡頭未開</div>
       <div id="qRec" class="q-rec" hidden aria-hidden="true">● 錄緊 <span id="qRecT">0</span> 秒</div>
+    </div>
+    <div class="q-ask">
+      <label class="lb" for="qAsk">🎯 想佢特別睇乜？（可以留空；先問，再影相或者錄片）</label>
+      <div class="fu-in">
+        <input type="text" id="qAsk" autocomplete="off" placeholder="例如：張單幾多錢？／有冇過期？／出口喺邊？">
+        <button class="btn sm" id="qAskClear" type="button" aria-label="清除問題">✕</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="qAskKeep"> 每次影都問同一條（唔剔：用完一次就清走）</label>
     </div>
     <div class="q-btns">
       <button class="qb" id="qShot" type="button" aria-label="影相，然後用廣東話講返相入面有乜"><i aria-hidden="true">📷</i><span>影相講嘢</span></button>
@@ -198,8 +260,146 @@ body.quick .wrap > :not(header):not(#quickUI){display:none !important}
       <div class="go"><button class="btn sm" type="button" id="qFlip">🔄 轉前／後鏡頭</button><button class="btn sm" type="button" id="qTestVoice">🔊 試吓把聲</button></div>
       <div class="note">錄片最長 60 秒。錄嘅時候 app 直接由鏡頭攞畫面，唔會整影片檔；所有嘢淨係喺記憶體，熄咗就冇。</div>
     </details>
+    <div id="qFuSlot"></div>
     <div class="note q-warn">⚠ 呢個係輔助工具，AI 會睇錯、會漏。唔好靠佢過馬路、避開危險或者睇藥物份量。</div>
   </section>
+  <!-- ================= 講故事／睇書 ================= -->
+  <section id="storyUI" aria-label="講故事">
+    <div class="card">
+      <h2>📖 講故事／睇書</h2>
+      <div class="drop" id="sDrop" tabindex="0" role="button" aria-describedby="sDropHelp">
+        <b>📂 揀一本書</b>
+        <p id="sDropHelp">PDF、幾張書頁相片（按檔名排頁），或者之前匯出嘅「.睇書.json」。故事書、繪本、教科書都得。</p>
+      </div>
+      <div class="go"><button class="btn" id="sCapBtn" type="button">📷 用鏡頭逐版影書</button></div>
+      <div id="sCap" class="s-cap" hidden>
+        <div class="q-cam"><video id="sVideo" playsinline muted autoplay aria-hidden="true"></video><div id="sCamMsg" class="q-cammsg">鏡頭未開</div></div>
+        <div class="q-btns">
+          <button class="qb" id="sShotCover" type="button" aria-label="影封面，AI 會認出書名同作者"><i aria-hidden="true">📕</i><span>影封面</span></button>
+          <button class="qb" id="sShot" type="button" aria-label="影下一版，一版或者左右兩版都得"><i aria-hidden="true">📷</i><span id="sShotLbl">影下一版</span></button>
+          <button class="qb" id="sShotApp" type="button" aria-label="用手機相機 app 影，通常更清楚"><i aria-hidden="true">📱</i><span>用相機 app</span></button>
+        </div>
+        <div class="note" id="sCapInfo" role="status" aria-live="polite"></div>
+        <div class="go"><button class="btn" id="sCapDone" type="button">✅ 影完，收起鏡頭</button></div>
+      </div>
+      <input type="file" id="sCapFile" accept="image/*" capture="environment" hidden>
+      <input type="file" id="sFile" accept="application/pdf,.pdf,image/*,.heic,.heif,.json,application/json" multiple hidden>
+      <div class="s-info"><span class="status" id="sBookInfo" style="margin:0;flex:1"></span><button class="btn sm" id="sRename" type="button" hidden>✏️ 改書名</button></div>
+      <details id="sOpts" class="pv" open>
+        <summary>⚙ 講法、準備方式、頁面顯示</summary>
+        <div class="row">
+          <div><label class="lb" for="sAge">講俾邊個聽</label>
+            <select id="sAge">
+              <option value="k">幼稚園（3–6 歲）</option>
+              <option value="p1">初小（6–9 歲）</option>
+              <option value="p4">高小（9–12 歲）</option>
+              <option value="adult">大人</option>
+            </select></div>
+          <div><label class="lb" for="sStyle">講法</label>
+            <select id="sStyle">
+              <option value="tell">講故事：用口語生動咁講，再講幅圖</option>
+              <option value="read">照讀：逐字讀書上嘅字，再講幅圖</option>
+              <option value="teach">講解：教科書用，解釋內容（練習唔講答案）</option>
+            </select></div>
+          <div><label class="lb" for="sLang">用咩語言講</label>
+            <select id="sLang">
+              <option value="yue">廣東話</option>
+              <option value="en">English（英文書）</option>
+              <option value="cmn">普通话</option>
+            </select></div>
+        </div>
+        <div class="row">
+          <div style="flex:2"><label class="lb" for="sMode">準備方式</label>
+            <select id="sMode">
+              <option value="ahead1">邊讀邊準備：預先準備下一頁（最慳 token）</option>
+              <option value="ahead2">邊讀邊準備：預先準備下兩頁（等得少啲）</option>
+              <option value="all">一次過準備全本：唔停直到做完，可以暫停、匯出、下次續做</option>
+            </select></div>
+        </div>
+        <div class="row">
+          <div><label class="lb" for="sView">頁面顯示</label>
+            <select id="sView">
+              <option value="auto">自動（闊畫面就雙頁）</option>
+              <option value="single">單頁</option>
+              <option value="double">左右雙頁</option>
+            </select></div>
+          <div><label class="lb" for="sCover">雙頁時第一頁</label>
+            <select id="sCover">
+              <option value="alone">第一頁係封面，單獨顯示</option>
+              <option value="paired">第一頁同第二頁一齊顯示</option>
+            </select></div>
+          <div><label class="lb" for="sDir">翻書方向</label>
+            <select id="sDir">
+              <option value="ltr">由左至右（一般橫排書、英文書）</option>
+              <option value="rtl">由右至左（直排中文書、漫畫）</option>
+            </select></div>
+        </div>
+        <label class="chk"><input type="checkbox" id="sAuto"> 讀完自動揭下一頁</label>
+        <label class="chk"><input type="checkbox" id="sAskKid"> 每頁最後問小朋友一條簡單問題</label>
+      </details>
+      <div class="note" id="sEst"></div>
+      <div class="note" id="sVoiceNote"></div>
+      <div class="go">
+        <label class="s-start" for="sStartSel">由 <select id="sStartSel"></select> 開始</label>
+        <button class="btn pri" id="sGo" type="button">▶ 開始講</button>
+        <button class="btn" id="sBatchOnly" type="button" hidden>📦 只準備全本（唔讀）</button>
+      </div>
+      <div id="sBatch" class="s-batch" hidden>
+        <div class="bar" style="display:block"><i id="sBatchBar"></i></div>
+        <div class="s-batch-row"><span id="sBatchTxt" class="note" style="margin:0;flex:1" role="status" aria-live="polite"></span>
+          <button class="btn sm" id="sBatchBtn" type="button"></button></div>
+      </div>
+      <div id="sStripBox" hidden>
+        <h3 class="s-h3">📚 版面一覽 <span class="note" style="font-weight:400">（撳一版揀佢；✅ 準備好 ⏳ 準備緊 ⬜ 未準備 ⏭ 跳過 ⚠️ 出錯）</span></h3>
+        <div class="s-strip" id="sStrip" role="list" aria-label="版面一覽"></div>
+        <div class="s-selbar" id="sSelBar" hidden>
+          <span id="sSelTxt" class="note" style="margin:0;flex-basis:100%"></span>
+          <button class="btn sm pri" id="sSelGo" type="button">▶ 由呢版講</button>
+          <button class="btn sm" id="sSelNum" type="button">✏️ 改頁碼</button>
+          <button class="btn sm" id="sSelSpread" type="button">⇆ 一版／兩版</button>
+          <button class="btn sm" id="sSelLeft" type="button" aria-label="移前一位">⬅ 移前</button>
+          <button class="btn sm" id="sSelRight" type="button" aria-label="移後一位">移後 ➡</button>
+          <button class="btn sm" id="sSelRetake" type="button">📷 重影呢版</button>
+          <button class="btn sm danger" id="sSelDel" type="button">🗑 刪除</button>
+          <button class="btn sm" id="sSort" type="button">🔢 按書上頁碼排序</button>
+        </div>
+      </div>
+      <div class="go" id="sExportRow" hidden>
+        <button class="btn sm" id="sExpFull" type="button">💾 匯出成本書（連頁面）</button>
+        <button class="btn sm" id="sExpLite" type="button">💾 只匯出逐字稿（細檔）</button>
+        <button class="btn sm" id="sExpTxt" type="button">📝 逐字稿 .txt</button>
+      </div>
+    </div>
+    <div class="card s-stage" id="sStage" hidden>
+      <div class="s-spread" id="sSpread" aria-label="書頁"></div>
+      <div class="s-bar2"><span id="sPageLbl" class="note" style="margin:0"></span>
+        <button class="btn sm" id="sViewToggle" type="button">📖 單頁／雙頁</button></div>
+      <div class="q-status" id="sStatus" role="status" aria-live="polite"></div>
+      <div class="q-text" id="sText" tabindex="0" aria-label="呢頁講嘅內容"></div>
+      <div id="sLive" class="sr" role="alert" aria-live="assertive"></div>
+      <div class="s-ctl" id="sCtl">
+        <button class="btn" id="sPrev" type="button" aria-label="上一頁">⏮ 上一頁</button>
+        <button class="btn" id="sPause" type="button">⏸ 暫停</button>
+        <button class="btn" id="sReplay" type="button">🔁 重讀</button>
+        <button class="btn" id="sStop" type="button">⏹ 停</button>
+        <button class="btn" id="sNext" type="button" aria-label="下一頁">下一頁 ⏭</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 追問（隨身、講故事、完整版共用；會搬去而家用緊嗰個畫面） ================= -->
+  <section id="fuBox" class="card fu" aria-labelledby="fuH">
+    <h2 id="fuH">💬 追問</h2>
+    <div class="note" id="fuWhat" style="margin-top:0"></div>
+    <div class="chips" id="fuTargets"></div>
+    <div id="fuThread" class="fu-thread" aria-live="polite"></div>
+    <div class="fu-in">
+      <textarea id="fuQ" rows="2" aria-label="你想問乜" placeholder="例如：我想拎嗰杯嘢，要點行過去？（可以撳鍵盤上嘅 🎤 用把口講）"></textarea>
+      <button class="btn pri" id="fuAsk" type="button">問</button>
+    </div>
+    <div class="note" id="fuEst"></div>
+  </section>
+
 
   <div class="priv">🔒 啲圖同結果淨係擺喺呢個分頁嘅記憶體，<b>唔會</b>寫入 localStorage 或者任何儲存位。熄咗或者 reload 個分頁就冇晒。張圖只會送去你喺 ⚙ 填嘅 Base URL；呢頁唔會由任何外面網站載入程式碼。</div>
 
@@ -365,7 +565,9 @@ const TPL_KEY = 'glmvision_tpl_v1';
 const DEF = {base:'', key:'', remember:true, model:'glm-5.3-flash', effort:'low', maxTok:16000,
              mode:'ocr', lang:'zh-Hant', res:'1600', slice:true,
              vMethod:'auto', vMax:'auto', vRes:'auto', vSmart:true, priceIn:0.15, priceOut:0.50, tokCal:1, tokCalN:0,
-             quick:false, qLen:'short', qSpeak:'app', qVoice:'', qRate:1};
+             quick:false, qLen:'short', qSpeak:'app', qVoice:'', qRate:1,
+             view:'full', sAge:'p1', sStyle:'tell', sLang:'yue', sAuto:true, sAskKid:false,
+             sMode:'ahead1', sView:'auto', sCover:'alone', sDir:'ltr', qAskKeep:false};
 let memKey = '';   /* 唔記住 key 嗰陣，key 淨係住喺呢度（記憶體） */
 function cfg(){
   let c;
@@ -396,7 +598,7 @@ function sleep(ms, signal){
 }
 function abortErr(){ const e = new Error('你撳咗停。'); e.name = 'AbortError'; e.stopped = true; return e; }
 function n0(x){ return String(x).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
-function kb(n){ return n > 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.round(n / 1024) + 'KB'; }
+function kb(n){ return n > 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB'; }
 async function copyText(t){
   try{ await navigator.clipboard.writeText(t); return true; }
   catch(e){
@@ -1691,7 +1893,7 @@ function renderStrip(r){
   d.appendChild(box); d.hidden = false;
 }
 function setImg(r, pic){
-  r.img = pic.url; r.imgEl.src = pic.url; r.imgEl.hidden = false;
+  r.img = pic.url; r.imgEl.src = pic.url; r.imgEl.hidden = false; r.pw = pic.w; r.ph = pic.h;
   r.meta = pic.w + '×' + pic.h + ' · ' + kb(pic.bytes);
 }
 
@@ -1735,6 +1937,7 @@ async function ask(r, o, signal, allowFallback){
     if(res.finish === 'length') text += '\n\n【⚠ 去到輸出上限，後面未寫完。可以喺 ⚙ 設定加大「輸出上限」再撳 🔁 重做。】';
     if(!text) throw new Error('AI 回咗空白。' + (res.reason ? '（佢諗咗 ' + n0(res.reason.length) + ' 字但冇出答案，多數係輸出上限太細）' : ''));
     r.ta.value = text; autoGrow(r.ta); r.think.hidden = true;
+    fuNewest();
     const u = res.usage;
     if(u && u.prompt_tokens && r.kind === 'frames' && r.estRaw){
       /* 用實際用量校正之後嘅估算（只係一個數，唔包任何內容） */
@@ -1938,7 +2141,7 @@ $('btnClear').onclick = function(){
   if(results.length && !confirm('清除晒所有結果同待睇嘅檔案？')) return;
   results.forEach(function(r){ r.card.remove(); }); results = [];
   queue.slice().forEach(function(q){ dropItem(q, true); });
-  $('empty').hidden = false; setStatus(''); exported = true;
+  $('empty').hidden = false; setStatus(''); exported = true; fuNewest();
 };
 /* 有未匯出嘅結果就提一提：熄咗就冇得救 */
 new MutationObserver(function(){ if(results.some(function(r){ return r.ta.value.trim(); })) exported = false; })
@@ -2061,7 +2264,14 @@ const Q_SPEAK_RULES = [
 '・見乜講乜，唔准估、唔准作。有真人就講外表、動作、表情，唔准估佢係邊個。',
 '・唔准開場白，唔准客套說話，唔准總結句。'
 ].join('\n');
-function quickSys(kind, len){
+function quickFocus(q){
+  if(!q) return '';
+  return ['', '【用戶想知】' + q,
+'・第一句就直接答呢條問題。答得到就答，講埋你係喺邊度見到（例如「單底右下角寫住」）。',
+'・答唔到或者睇唔清，就直接講，再教佢點樣影到（例如「將張單拎近啲」「影埋背面」「向左轉少少」）。',
+'・答完先用一兩句講其他重要嘢，特別係危險；唔使詳細描述成個畫面。'].join('\n');
+}
+function quickSys(kind, len, q){
   const short = len !== 'long';
   if(kind === 'frames') return [
 '你係一位幫視障人士睇嘢嘅口述員。用戶啱啱用手機錄咗一段片，佢完全睇唔到。你收到嘅係由段片按時間抽出嚟嘅畫面，每格前面有時間；你睇唔到格與格之間嘅動作，亦都聽唔到聲。',
@@ -2075,7 +2285,7 @@ function quickSys(kind, len){
 short ? '・長度：大約四至八句，揀最重要嘅講。' : '・長度：可以詳細啲，逐段講清楚，但都係先講重點。',
 '',
 Q_SPEAK_RULES
-  ].join('\n');
+  ].join('\n') + quickFocus(q);
   return [
 '你係一位幫視障人士睇嘢嘅口述員。用戶啱啱用手機影咗相，佢完全睇唔到，你寫嘅嘢會即刻讀俾佢聽。',
 '',
@@ -2089,19 +2299,27 @@ short ? '・見到有字（招牌、標籤、包裝、螢幕、信件、餐牌�
 short ? '・長度：大約三至六句。' : '・長度：可以詳細，但都係先講重點，再講細節。',
 '',
 Q_SPEAK_RULES
-  ].join('\n');
+  ].join('\n') + quickFocus(q);
 }
 
 /* ---------- 廣東話語音（用手機本身嘅聲；iPhone、Android 一般喺部機度合成） ---------- */
-const tts = {sents:[], idx:0, fed:0, buf:'', paused:false, speaking:false, token:0, unlocked:false};
+const tts = {sents:[], idx:0, fed:0, buf:'', paused:false, speaking:false, token:0, unlocked:false, lang:'yue', final:false, onDone:null};
 function ttsSupported(){ return 'speechSynthesis' in window && typeof SpeechSynthesisUtterance === 'function'; }
 function yueVoices(){
   if(!ttsSupported()) return [];
   return speechSynthesis.getVoices().filter(function(v){ return /^(yue|zh[-_]HK)/i.test(v.lang) || /cantonese|粵|粤|廣東|广东/i.test(v.name); });
 }
-function ttsVoice(){
-  const vs = yueVoices(); if(!vs.length) return null;
-  const want = cfg().qVoice;
+function langVoices(lang){
+  if(!ttsSupported()) return [];
+  if(lang === 'en') return speechSynthesis.getVoices().filter(function(v){ return /^en/i.test(v.lang); })
+    .sort(function(a, b){ return (/en[-_]GB/i.test(b.lang) ? 1 : 0) - (/en[-_]GB/i.test(a.lang) ? 1 : 0); });
+  if(lang === 'cmn') return speechSynthesis.getVoices().filter(function(v){ return /^(zh[-_](CN|TW|Hans|Hant)?$|zh[-_]CN|cmn)/i.test(v.lang) && !/HK|yue/i.test(v.lang); });
+  return yueVoices();
+}
+function ttsVoice(lang){
+  lang = lang || tts.lang || 'yue';
+  const vs = langVoices(lang); if(!vs.length) return null;
+  const want = lang === 'yue' ? cfg().qVoice : '';
   return vs.find(function(v){ return v.name === want; }) || vs.find(function(v){ return v.localService; }) || vs[0];
 }
 function ttsUnlock(){
@@ -2116,7 +2334,7 @@ function ttsClean(t){
 function ttsSay(text, onend){
   const u = new SpeechSynthesisUtterance(text);
   const v = ttsVoice(); if(v) u.voice = v;
-  u.lang = v ? v.lang : 'zh-HK';
+  u.lang = v ? v.lang : ({yue:'zh-HK', en:'en-GB', cmn:'zh-CN'}[tts.lang] || 'zh-HK');
   u.rate = +cfg().qRate || 1;
   u.onend = u.onerror = function(){ if(onend) onend(); };
   tts.cur = u;                      /* 留住個 reference，Chrome 先唔會中途食咗 onend */
@@ -2124,7 +2342,11 @@ function ttsSay(text, onend){
 }
 function ttsPump(){
   if(cfg().qSpeak !== 'app' || !ttsSupported()) return;
-  if(tts.speaking || tts.paused || tts.idx >= tts.sents.length) return;
+  if(tts.speaking || tts.paused) return;
+  if(tts.idx >= tts.sents.length){
+    if(tts.final && tts.onDone){ const f = tts.onDone; tts.onDone = null; f(); }   /* 成篇讀完 */
+    return;
+  }
   const my = ++tts.token;
   tts.speaking = true;
   ttsSay(tts.sents[tts.idx], function(){
@@ -2134,16 +2356,18 @@ function ttsPump(){
 }
 function ttsReset(keepCue){
   tts.token++; tts.sents = []; tts.idx = 0; tts.fed = 0; tts.buf = ''; tts.paused = false; tts.speaking = false;
+  tts.final = false; tts.onDone = null;
   if(!keepCue && ttsSupported()) speechSynthesis.cancel();   /* keepCue：唔好截斷啱啱講緊嘅「影咗，睇緊」 */
 }
 /* 一路出字一路讀：每夠一句就讀，唔使等成篇寫完 */
 function ttsFeed(full, final){
   tts.buf += full.slice(tts.fed); tts.fed = full.length;
-  const re = /[^。！？!?\n]*[。！？!?\n]+/g;
+  const re = tts.lang === 'en' ? /[^.!?\n]*[.!?\n]+(?=\s|$)/g : /[^。！？!?\n]*[。！？!?\n]+/g;
   let m, used = 0;
   while((m = re.exec(tts.buf))){ const s = ttsClean(m[0]); if(s) tts.sents.push(s); used = re.lastIndex; }
   tts.buf = tts.buf.slice(used);
   if(final && tts.buf.trim()){ tts.sents.push(ttsClean(tts.buf)); tts.buf = ''; }
+  if(final) tts.final = true;
   ttsPump();
 }
 function ttsCue(text){
@@ -2215,16 +2439,28 @@ function qCamStop(){
 function qLive(){ const v = $('qVideo'); return !!(qStream && v.videoWidth); }
 
 /* ---------- 開／關隨身模式 ---------- */
-function setQuick(on, save){
-  document.body.classList.toggle('quick', on);
-  $('btnQuick').textContent = on ? '🗂 完整版' : '🦯 隨身口述';
-  if(save) cfgPatch('quick', on);
-  if(on){ refreshVoiceUI(); qCamStart(); }
-  else{ qCamStop(); if(qRecState) qRecStop(true); ttsReset(); }
+let curView = 'full';
+function setView(v, save){
+  const prev = curView; curView = v;
+  document.body.classList.toggle('quick', v === 'quick');
+  document.body.classList.toggle('story', v === 'story');
+  $('btnFull').hidden = v === 'full';
+  $('btnQuick').hidden = v === 'quick';
+  $('btnStory').hidden = v === 'story';
+  if(save) cfgPatch('view', v);
+  if(prev !== v){ ttsReset(); if(prev === 'story'){ storyHalt(); sCapClose(); } }
+  tts.lang = v === 'story' ? story.lang : 'yue';
+  if(v === 'quick'){ refreshVoiceUI(); qCamStart(); } else { qCamStop(); if(qRecState) qRecStop(true); }
+  if(v === 'story') storyRefreshUI();
+  fuMount();
 }
-$('btnQuick').onclick = function(){ ttsUnlock(); setQuick(!document.body.classList.contains('quick'), true); };
+function setQuick(on, save){ setView(on ? 'quick' : 'full', save); }
+$('btnQuick').onclick = function(){ ttsUnlock(); setView('quick', true); };
+$('btnStory').onclick = function(){ ttsUnlock(); setView('story', true); };
+$('btnFull').onclick = function(){ setView('full', true); };
 document.addEventListener('visibilitychange', function(){
-  if(!document.body.classList.contains('quick')) return;
+  if(curView === 'story' && !$('sCap').hidden){ if(document.hidden) sCamStop(); else sCamStart(); return; }
+  if(curView !== 'quick') return;
   if(document.hidden){ if(!qRecState) qCamStop(); } else qCamStart();
 });
 
@@ -2234,9 +2470,11 @@ function qSetStatus(t){ $('qStatus').textContent = t; }
 function qButtons(dis){ ['qShot', 'qPick'].forEach(function(id){ $(id).disabled = dis; }); }
 async function qDescribe(job){
   if(!cfgReady()){ const m = '未設定好 AI。請叫人幫手喺完整版撳「設定」填中轉站網址。'; qSetStatus(m); ttsCue(m); return; }
+  if(fu.ctrl) fu.ctrl.abort();
   qBusy = true; qButtons(true); qCtrl = new AbortController();
-  ttsReset(true); $('qText').textContent = ''; $('qPause').textContent = '⏸ 暫停';
+  ttsReset(true); tts.lang = 'yue'; $('qText').textContent = ''; $('qPause').textContent = '⏸ 暫停';
   const len = cfg().qLen || 'short';
+  const askQ = $('qAsk').value.trim();
   const t0 = Date.now();
   let gotText = false;
   const waitTimer = setInterval(function(){
@@ -2245,19 +2483,20 @@ async function qDescribe(job){
     if(!gotText && s > 0 && s % 12 === 0) ttsCue('仲睇緊，等等');
   }, 1000);
   /* 同時放入完整版嘅結果，方便之後複製或者匯出 */
-  const r = makeCard((job.kind === 'frames' ? '🎥 ' : '📷 ') + job.title);
+  const r = makeCard((job.kind === 'frames' ? '🎥 ' : '📷 ') + job.title + (askQ ? '（問：' + askQ.slice(0, 20) + '）' : ''));
   r.kind = job.kind;
   if(job.kind === 'frames'){ r.frames = job.frames; r.dur = job.dur; setThumb(r, job.frames[0].url); renderStrip(r); }
-  else{ r.img = job.img; setThumb(r, job.img); }
+  else{ r.img = job.img; r.pw = job.w; r.ph = job.h; setThumb(r, job.img); }
   try{
     let content;
     if(job.kind === 'frames'){
-      content = [{type:'text', text:'用戶錄咗一段大約 ' + Math.max(1, Math.round(job.dur)) + ' 秒嘅片，以下係按時間抽出嚟嘅 ' + job.frames.length + ' 格畫面。請講俾佢聽發生咗乜事。'}];
+      content = [{type:'text', text:'用戶錄咗一段大約 ' + Math.max(1, Math.round(job.dur)) + ' 秒嘅片，以下係按時間抽出嚟嘅 ' + job.frames.length + ' 格畫面。'
+        + (askQ ? '佢想知：' + askQ : '請講俾佢聽發生咗乜事。')}];
       job.frames.forEach(function(f){ content.push({type:'text', text:'[' + fmtT(f.t) + ']'}); content.push({type:'image_url', image_url:{url:f.url}}); });
     }else{
-      content = [{type:'text', text:'用戶啱啱' + (job.fromFile ? '揀咗' : '影咗') + '呢張相，請講俾佢聽。'}, {type:'image_url', image_url:{url:job.img}}];
+      content = [{type:'text', text:'用戶啱啱' + (job.fromFile ? '揀咗' : '影咗') + '呢張相。' + (askQ ? '佢想知：' + askQ : '請講俾佢聽。')}, {type:'image_url', image_url:{url:job.img}}];
     }
-    const res = await callVision([{role:'system', content:quickSys(job.kind, len)}, {role:'user', content:content}],
+    const res = await callVision([{role:'system', content:quickSys(job.kind, len, askQ)}, {role:'user', content:content}],
       {temp:0.3, signal:qCtrl.signal,
        onNote:function(m){ qSetStatus('⏳ ' + m); },
        onDelta:function(d){
@@ -2271,6 +2510,12 @@ async function qDescribe(job){
     const text = String(res.text || '').trim();
     if(!text) throw new Error('AI 冇回答，請再試一次。');
     $('qText').textContent = text; r.ta.value = text; autoGrow(r.ta);
+    fuNewest();
+    if(askQ){
+      /* 將「先問」當做第一個問答，之後追問會接住 */
+      fu.thread = [{q:askQ, a:text, meta:'（影相之前問嘅）'}]; fuRender();
+      if(!$('qAskKeep').checked) $('qAsk').value = '';
+    }
     ttsFeed(text, true);
     const u = res.usage;
     const meta = Math.round((Date.now() - t0) / 1000) + ' 秒' + (u ? ' · ' + fmtUSD(costOf(u.prompt_tokens || 0, u.completion_tokens || 0)) : '');
@@ -2294,8 +2539,8 @@ $('qShot').onclick = async function(){
   if(!qLive() && !(await qCamStart() && qLive())){ $('qCapPhoto').click(); return; }
   const v = $('qVideo');
   const pic = toJpeg(v, 0, 0, v.videoWidth, v.videoHeight, qPx());
-  ttsReset(); beep(880, 120); ttsCue('影咗，睇緊');
-  qDescribe({kind:'image', img:pic.url, title:'影相 ' + new Date().toLocaleTimeString('zh-HK', {hour:'2-digit', minute:'2-digit'})});
+  ttsReset(); beep(880, 120); ttsCue($('qAsk').value.trim() ? '影咗，搵緊答案' : '影咗，睇緊');
+  qDescribe({kind:'image', img:pic.url, w:pic.w, h:pic.h, title:'影相 ' + new Date().toLocaleTimeString('zh-HK', {hour:'2-digit', minute:'2-digit'})});
 };
 
 /* ---------- 錄片：錄嘅時候直接由鏡頭每半秒攞一格，唔整影片檔 ---------- */
@@ -2358,7 +2603,7 @@ async function qFromFile(file){
       ttsReset(); ttsCue('收到，睇緊');
       const dec = await decodeAny({kind:kind, file:file, name:file.name || ''});
       let pic; try{ pic = toJpeg(dec.src, 0, 0, dec.w, dec.h, qPx()); }finally{ freeDecoded(dec); }
-      qDescribe({kind:'image', img:pic.url, title:file.name || '相', fromFile:true});
+      qDescribe({kind:'image', img:pic.url, w:pic.w, h:pic.h, title:file.name || '相', fromFile:true});
     }else{
       throw new Error('呢個檔唔係相或者片');
     }
@@ -2397,6 +2642,10 @@ $('qTestVoice').onclick = function(){ ttsUnlock(); if(!ttsSupported()) return; s
 (function(){
   const c = cfg();
   $('qLen').value = c.qLen === 'long' ? 'long' : 'short';
+  $('qAskKeep').checked = !!c.qAskKeep;
+  $('qAskKeep').onchange = function(){ cfgPatch('qAskKeep', $('qAskKeep').checked); };
+  $('qAskClear').onclick = function(){ $('qAsk').value = ''; $('qAsk').focus(); };
+  $('qAsk').addEventListener('keydown', function(e){ if(e.key === 'Enter' && !e.isComposing){ e.preventDefault(); $('qAsk').blur(); $('qShot').focus(); } });
   $('qSpeak').value = /^(app|sr|off)$/.test(c.qSpeak) ? c.qSpeak : 'app';
   $('qRate').value = c.qRate || 1; $('qRateV').textContent = '×' + (+$('qRate').value).toFixed(1);
   $('qLen').onchange = function(){ cfgPatch('qLen', $('qLen').value); };
@@ -2406,9 +2655,1021 @@ $('qTestVoice').onclick = function(){ ttsUnlock(); if(!ttsSupported()) return; s
   if(ttsSupported()) speechSynthesis.onvoiceschanged = refreshVoiceUI;
   refreshVoiceUI();
   /* 網址加 #quick，或者上次停喺隨身模式 → 一開就入隨身模式（方便加去主畫面當 app 用） */
-  if(location.hash === '#quick' || c.quick) setQuick(true, false);
+
 })();
 
+/* ===================================================================
+   追問：預設淨係再送「最近嗰張」；你特登揀先會一齊送幾張
+   =================================================================== */
+function evenlyPick(arr, n){
+  if(arr.length <= n) return arr.slice();
+  const out = []; for(let i = 0; i < n; i++) out.push(arr[Math.round(i * (arr.length - 1) / Math.max(1, n - 1))]); return out;
+}
+const fu = {sel:null, thread:[], busy:false, ctrl:null};
+let subjSeq = 0;
+const FU_MAX_FRAMES = 8;   /* 追問一段片：最多再送 8 格，唔會成段片再送 */
+function fuSubjects(){
+  if(curView === 'story'){
+    const c = story.cache[story.idx];
+    return (c && c.img && story.idx >= 0) ? [{id:'p' + story.idx, title:storyLabel(story.idx, true), img:c.img, w:c.w, h:c.h, desc:c.text || ''}] : [];
+  }
+  return results.filter(function(r){ return r.img || (r.frames && r.frames.length); }).slice(-6).map(function(r){
+    if(!r.sid) r.sid = 'r' + (++subjSeq);
+    return {id:r.sid, title:r.title, img:r.img, frames:r.frames, w:r.pw, h:r.ph, desc:r.ta.value, dur:r.dur};
+  });
+}
+function fuSelected(subs){
+  const chosen = fu.sel ? subs.filter(function(s){ return fu.sel.has(s.id); }) : [];
+  return chosen.length ? chosen : (subs.length ? [subs[subs.length - 1]] : []);
+}
+function fuImages(sub){
+  if(sub.frames && sub.frames.length) return evenlyPick(sub.frames, FU_MAX_FRAMES).map(function(f){ return {url:f.url, w:f.w, h:f.h, t:f.t}; });
+  return [{url:sub.img, w:sub.w || 1280, h:sub.h || 960}];
+}
+function fuNewest(){ fu.thread = []; fu.sel = null; fuRender(); }
+function fuMount(){
+  const box = $('fuBox');
+  if(curView === 'quick') $('qFuSlot').appendChild(box);
+  else if(curView === 'story') $('storyUI').appendChild(box);
+  else document.querySelector('.wrap').appendChild(box);
+  fuRender();
+}
+function fuLang(){
+  if(curView === 'story') return story.lang;
+  if(curView === 'quick') return 'yue';
+  const l = $('lang').value; return /^en/.test(l) ? 'en' : l === 'zh-Hans' ? 'cmn' : l === 'yue' ? 'yue' : 'zh';
+}
+function fuSpeaks(){ return curView !== 'full' && cfg().qSpeak === 'app' && ttsSupported(); }
+function fuEstimate(subs){
+  let inT = 600, imgs = 0;
+  subs.forEach(function(s){ fuImages(s).forEach(function(f){ inT += imgTokens(f.w, f.h) + 6; imgs++; }); inT += Math.round(Math.min(1500, (s.desc || '').length) * 0.8); });
+  fu.thread.forEach(function(t){ inT += Math.round((t.q.length + t.a.length) * 0.8); });
+  inT = Math.round(inT * calFactor());
+  return {imgs:imgs, inT:inT, outT:thinkTokens() + 300};
+}
+function fuRender(){
+  const box = $('fuBox'); if(!box) return;
+  const subs = fuSubjects();
+  box.hidden = !subs.length;
+  if(!subs.length) return;
+  const sel = fuSelected(subs), selIds = new Set(sel.map(function(s){ return s.id; }));
+  $('fuQ').placeholder = curView === 'story' ? '例如：點解小熊要瞓覺？（可以撳鍵盤上嘅 🎤 用把口講）'
+    : curView === 'quick' ? '例如：我想拎嗰杯嘢，要點行過去？（可以撳鍵盤上嘅 🎤 用把口講）'
+    : '例如：張單總共幾多錢？／第二段講咩？';
+  $('fuWhat').textContent = curView === 'story' ? '就住呢一頁問問題，小朋友或者家長都得。問嘅時候會暫停講故事。'
+    : subs.length > 1 ? '預設淨係睇最近嗰張。想佢一齊睇其他張，撳下面張圖揀埋（揀得多，用嘅 token 就多）。'
+    : '會根據頭先嗰張答你。';
+  const tg = $('fuTargets'); tg.innerHTML = '';
+  if(subs.length > 1 && curView !== 'story'){
+    subs.forEach(function(s){
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'tg';
+      b.setAttribute('aria-pressed', selIds.has(s.id) ? 'true' : 'false');
+      b.setAttribute('aria-label', (selIds.has(s.id) ? '已揀：' : '未揀：') + s.title);
+      const im = document.createElement('img'); im.alt = ''; im.src = s.frames ? s.frames[0].url : s.img;
+      const sp = document.createElement('span'); sp.textContent = s.title.length > 14 ? s.title.slice(0, 13) + '…' : s.title;
+      b.append(im, sp);
+      b.onclick = function(){
+        const cur = new Set(fuSelected(fuSubjects()).map(function(x){ return x.id; }));
+        if(cur.has(s.id)){ if(cur.size > 1) cur.delete(s.id); } else cur.add(s.id);
+        fu.sel = cur; fuRender();
+      };
+      tg.appendChild(b);
+    });
+  }
+  const th = $('fuThread'); th.innerHTML = '';
+  fu.thread.forEach(function(t){
+    const d = document.createElement('div'); d.className = 'qa';
+    const q = document.createElement('div'); q.className = 'q'; q.textContent = '🙋 ' + t.q;
+    const a = document.createElement('div'); a.className = 'a'; a.textContent = t.a || '…'; t.el = a;
+    const m = document.createElement('div'); m.className = 'm'; m.textContent = t.meta || ''; t.mel = m;
+    d.append(q, a, m); th.appendChild(d);
+  });
+  const e = fuEstimate(sel);
+  $('fuEst').textContent = '下一條問題會送 ' + e.imgs + ' 張圖' + (fu.thread.length ? '＋之前 ' + fu.thread.length + ' 個問答' : '') + '，大約 ' + n0(e.inT) + ' token（' + fmtUSD(costOf(e.inT, e.outT)) + '）。';
+}
+function fuSys(){
+  const lang = fuLang();
+  if(curView === 'story'){
+    const o = storyOpts();
+    return [
+'你係陪小朋友睇書嘅姐姐或者哥哥。小朋友（或者家長）就住呢一頁書問你問題。',
+'・聽眾係' + STORY_AGE[o.age] + '，用佢聽得明嘅說話答，親切、鼓勵。',
+'・根據呢頁書嘅字同圖答。書入面冇講嘅，可以話「書冇講，我哋估吓」，但一定要講明係估。',
+'・教科書練習或者題目：唔好直接講答案，用一兩個提示引導佢自己諗。',
+'・大約二至四句，直接答。',
+storyLangRule(lang), Q_SPEAK_RULES.replace(/・全部用香港廣東話口語[^\n]*\n/, '')
+    ].join('\n');
+  }
+  const base = [
+'你係一個幫手睇嘢嘅助手。用戶頭先俾咗你睇相或者片，而家就住呢啲畫面問你問題。用戶可能睇唔到嘢。',
+'・只根據圖入面真係見到嘅嘢答。見唔到、答唔到嘅，就老實講，再教佢點樣影過（例如影近啲個標籤、向右轉少少）。',
+'・佢問點做，就俾具體、一步一步、做得到嘅建議；位置用正前面、左手邊、大約兩步呢類講法。',
+'・涉及安全（過馬路、電、火、熱水、利器、藥物份量、食物過期、陌生人、錢）：講你見到嘅資料，但一定提醒佢搵身邊嘅人或者專業人士確認，唔好單靠你。',
+'・先直接答佢問嘅嘢，大約二至五句，唔使重複之前嘅描述。',
+'・有幾張圖嗰陣，講明你講緊邊張（圖一、圖二）。'
+  ];
+  if(curView === 'quick') return base.concat([Q_SPEAK_RULES]).join('\n');
+  const L = LANGS[$('lang').value] || LANGS['zh-Hant'];
+  return base.concat(['・' + L.rule, '・純文字，唔用 markdown 符號。']).join('\n');
+}
+async function fuAsk(){
+  const q = $('fuQ').value.trim();
+  if(!q){ $('fuQ').focus(); return; }
+  if(fu.busy){ toast('等佢答完先'); return; }
+  if(!cfgReady()){ toast('未設定好 AI'); openCfg(); return; }
+  const subs = fuSelected(fuSubjects());
+  if(!subs.length){ toast('未有相可以問'); return; }
+  ttsUnlock();
+  if(curView === 'story') storyHoldOn();
+  fu.busy = true; $('fuAsk').disabled = true; fu.ctrl = new AbortController();
+  const turn = {q:q, a:'', meta:'⏳ 諗緊…'};
+  const history = fu.thread.slice();
+  fu.thread.push(turn); $('fuQ').value = ''; fuRender();
+  const speak = fuSpeaks();
+  ttsReset(); tts.lang = fuLang() === 'zh' ? 'yue' : fuLang();
+  const t0 = Date.now();
+  try{
+    const first = [{type:'text', text:'以下係用戶想問嘅' + (subs.length > 1 ? ' ' + subs.length + ' 張圖' : '圖') + '。'}];
+    subs.forEach(function(s, k){
+      first.push({type:'text', text:(subs.length > 1 ? '【圖' + '一二三四五六'.charAt(k) + '】' : '') + s.title + (s.desc ? '\n你之前對佢嘅描述：' + s.desc.slice(0, 1500) : '')});
+      fuImages(s).forEach(function(f){
+        if(f.t !== undefined) first.push({type:'text', text:'[' + fmtT(f.t) + ']'});
+        first.push({type:'image_url', image_url:{url:f.url}});
+      });
+    });
+    const msgs = [{role:'system', content:fuSys()}];
+    if(history.length){
+      msgs.push({role:'user', content:first.concat([{type:'text', text:history[0].q}])});
+      msgs.push({role:'assistant', content:history[0].a});
+      for(let i = 1; i < history.length; i++){ msgs.push({role:'user', content:history[i].q}); msgs.push({role:'assistant', content:history[i].a}); }
+      msgs.push({role:'user', content:q});
+    }else{
+      msgs.push({role:'user', content:first.concat([{type:'text', text:q}])});
+    }
+    const res = await callVision(msgs, {temp:0.3, signal:fu.ctrl.signal,
+      onNote:function(m){ turn.meta = '⏳ ' + m; if(turn.mel) turn.mel.textContent = turn.meta; },
+      onDelta:function(d){
+        if(d.text){ turn.a = d.text; if(turn.el) turn.el.textContent = d.text; if(speak) ttsFeed(d.text, false); }
+        else if(d.reason && turn.mel){ turn.mel.textContent = '🧠 諗緊…'; }
+      }});
+    turn.a = String(res.text || '').trim() || '（AI 冇回答）';
+    if(speak) ttsFeed(turn.a, true);
+    else if(curView !== 'full' && cfg().qSpeak === 'sr'){ const live = curView === 'story' ? $('sLive') : $('qLive'); live.textContent = ''; setTimeout(function(){ live.textContent = turn.a; }, 80); }
+    const u = res.usage;
+    turn.meta = Math.round((Date.now() - t0) / 1000) + ' 秒' + (u ? ' · ' + n0(u.prompt_tokens || 0) + ' → ' + n0(u.completion_tokens || 0) + ' token · ' + fmtUSD(costOf(u.prompt_tokens || 0, u.completion_tokens || 0)) : '');
+  }catch(err){
+    turn.a = turn.a || ''; turn.meta = err.stopped ? '⏹ 停咗' : ('❌ ' + String(err.message || err).split('\n')[0]);
+    if(!err.stopped && speak) ttsCue('出錯，問唔到');
+    if(!turn.a){ fu.thread.pop(); $('fuQ').value = q; }
+  }finally{
+    fu.busy = false; fu.ctrl = null; $('fuAsk').disabled = false; fuRender();
+  }
+}
+$('fuAsk').onclick = fuAsk;
+$('fuQ').addEventListener('keydown', function(e){ if(e.key === 'Enter' && !e.shiftKey && !e.isComposing){ e.preventDefault(); fuAsk(); } });
+
+/* ===================================================================
+   講故事／睇書
+   兩種準備方式：① 邊讀邊準備（下一頁／下兩頁）② 一次過準備全本（可以暫停、匯出、下次續做）
+   =================================================================== */
+const STORY_AGE = {k:'三至六歲嘅幼稚園小朋友', p1:'六至九歲嘅初小學生', p4:'九至十二歲嘅高小學生', adult:'大人'};
+const story = {name:'', author:'', source:'', autoName:false, pages:[], idx:-1, sel:-1, cache:{}, genCtrl:null, hold:true, reading:false, lang:'yue', key:'',
+               batchOn:false, batchPaused:false, pending:null, spent:0, retake:null, nums:null, startWant:0, capCover:false, dirHint:false, wake:null};
+function storyOpts(){ return {age:$('sAge').value, style:$('sStyle').value, lang:$('sLang').value, ask:$('sAskKid').checked}; }
+function storyKey(o){ return [o.age, o.style, o.lang, o.ask].join('|'); }
+function storyLangRule(lang){
+  if(lang === 'en') return '・Output language: natural spoken English only, ready to be read aloud. No symbols, no headings, no lists.';
+  if(lang === 'cmn') return '・全部用普通话口语，简体字。';
+  return '・全部用香港廣東話口語講，好似坐喺小朋友隔籬講故事咁。用正寫：嘅、喺、咗、嚟、啲、冇、佢。';
+}
+function storySys(o){
+  const len = {k:'每頁大約二至五句，用好簡單嘅字。', p1:'每頁大約三至七句。', p4:'可以詳細啲，但都要清楚易明。', adult:'正常長度。'}[o.age];
+  const style = {
+    tell:'用口語講出呢頁嘅內容：意思要忠於原文，唔好自己加情節；可以講得生動啲，有對白就講明邊個講、用乜語氣講。之後用一兩句講幅圖畫咗乜（人物、表情、顏色、動作），等睇唔到圖嘅小朋友都知道。',
+    read:o.lang === 'en' ? 'Read the printed words on this page exactly as written. Then add one or two sentences describing the picture.'
+                         : '照住書上嘅字逐字讀出嚟，唔好改字（書面語都照原文，會用' + (o.lang === 'cmn' ? '普通话' : '廣東話讀音') + '讀）。讀完再用一兩句講幅圖畫咗乜。',
+    teach:'用' + STORY_AGE[o.age] + '聽得明嘅說話講解呢頁：先講呢頁講緊乜，再解釋重點同生字，可以舉日常生活例子。有練習或者題目：照讀題目，俾一兩個提示，但唔可以講答案，亦唔可以代佢填。'
+  }[o.style];
+  return [
+'你係一位好識講故事嘅姐姐或者哥哥。家長會逐張俾你睇一本書（故事書、繪本、教科書都得），每張可能係書嘅一版，亦可能一次影咗左右兩版。你要將呢張入面嘅內容變成講俾' + STORY_AGE[o.age] + '聽嘅說話，之後會即刻用語音讀出嚟。',
+'',
+'【第一行：書頁資料，唔會讀出嚟】',
+'・第一行一定要係 @@ 加一個 JSON，例如：@@ {"type":"content","pages":["12","13"],"title":"","author":"","vertical":false}',
+'・type：封面寫 cover；版權頁、空白頁、目錄、出版資料、廣告頁寫 skip；其他寫 content。',
+'・pages：張相入面每一版印住嘅頁碼，按翻書次序；某一版冇印頁碼就寫空字串，例如 ["","13"]；只有一版就只寫一個。見到先寫，唔好估。',
+'・title、author：封面先填書名同作者，其他留空字串。',
+'・vertical：正文係直排就寫 true。',
+'・第二行開始先係講嘅內容。skip 嘅話，第二行只寫【跳過】。',
+'',
+'【點講】',
+'・張相有兩版嘅話，按翻書方向先講第一版再講第二版，自然接住講，唔使講左邊右邊。',
+'・' + style,
+'・' + len,
+'・封面：講書名同作者，再一句講封面畫咗乜。',
+'・前後要連貫：會話你知上一頁講到邊，接住講，唔好重複，唔好每頁重新介紹。',
+o.ask ? '・最後用一句問小朋友一條同呢頁有關嘅簡單問題，例如你估小熊跟住會點做。' : '・唔好問問題，講完呢頁就停。',
+'・書入面如果有唔適合小朋友嘅字眼，用溫和講法帶過。',
+'',
+'【朗讀規則】',
+storyLangRule(o.lang),
+'・除咗第一行同【跳過】，唔准有任何符號：括號、星號、井號、項目符號、emoji、箭咀、標題。',
+'・數字、時間、價錢用口講嘅讀法寫。',
+'・唔准講「呢頁」「第幾頁」「以下係」呢類旁白，唔准開場白，直接講內容。'
+  ].join('\n');
+}
+/* ---------- 頁碼：三種號碼 ----------
+   ① 第幾張：喺呢本「書」入面嘅次序（PDF 第幾頁、第幾張相）。永遠有，用嚟揭頁。
+   ② 書上頁碼：AI 喺頁面上讀到嘅頁碼（可以自己改）。顯示、匯出用呢個。
+   ③ 估計頁碼：冇印頁碼嘅版，由前面讀到嘅頁碼推出嚟，標住「約」。 */
+function storyParse(raw){
+  const t = String(raw || '').replace(/^\s+/, '');
+  if(!t) return {meta:null, body:'', partial:true};
+  if(t.charAt(0) === '@' || t.slice(0, 3) === '```'){
+    const m = /^(?:```\w*\s*)?@@\s*(\{[^{}]*\})\s*(?:```)?\s*/.exec(t);
+    if(!m) return {meta:null, body:'', partial:true};
+    let meta = null; try{ meta = JSON.parse(m[1]); }catch(e){}
+    return {meta:meta, body:t.slice(m[0].length).trim(), partial:false};
+  }
+  return {meta:null, body:t.trim(), partial:false};
+}
+function storyType(i){
+  const pg = story.pages[i] || {}, c = story.cache[i] || {};
+  if(pg.isCover) return 'cover';
+  return (c.meta && c.meta.type) || (c.skip ? 'skip' : '');
+}
+function storyPrinted(i){
+  const pg = story.pages[i] || {}, c = story.cache[i] || {};
+  if(Array.isArray(pg.printed)) return pg.printed.map(String);
+  return (c.meta && Array.isArray(c.meta.pages)) ? c.meta.pages.map(function(x){ return String(x == null ? '' : x).trim(); }) : [];
+}
+function storyIsSpread(i){
+  const pg = story.pages[i] || {}, c = story.cache[i] || {};
+  if(pg.spread === true || pg.spread === false) return pg.spread;
+  if(Array.isArray(pg.printed) && pg.printed.length) return pg.printed.length >= 2;
+  if(c.meta && Array.isArray(c.meta.pages) && c.meta.pages.length) return c.meta.pages.length >= 2;
+  if(c.w && c.h) return c.w > c.h * 1.15;      /* 未有 AI 結果：打橫影嘅多數係左右兩版 */
+  return false;
+}
+function storyNumbers(){
+  const out = []; let last = null;
+  for(let i = 0; i < story.pages.length; i++){
+    const t = storyType(i), cnt = storyIsSpread(i) ? 2 : 1;
+    const raw = storyPrinted(i).slice(0, 2);
+    let nums = raw.map(function(x){ const n = parseInt(String(x).replace(/[^\d]/g, ''), 10); return isNaN(n) ? null : n; });
+    if(nums.some(function(n){ return n !== null; })){
+      if(nums.length === 2 && nums[0] === null) nums[0] = nums[1] - 1;
+      if(nums.length === 2 && nums[1] === null) nums[1] = nums[0] + 1;
+      if(nums.length === 1 && cnt === 2) nums = [nums[0], nums[0] + 1];
+      const shown = raw.length === 2 && raw.every(function(x){ return x && !/^\d+$/.test(x); }) ? raw : nums;   /* 羅馬數字、甲乙丙之類照用書上寫法 */
+      out[i] = {nums:shown, est:false}; last = Math.max.apply(null, nums);
+    }else if(t === 'cover' || t === 'skip'){
+      out[i] = {nums:[], est:false};
+    }else if(last !== null){
+      const a = last + 1; out[i] = {nums:cnt === 2 ? [a, a + 1] : [a], est:true}; last = a + cnt - 1;
+    }else out[i] = {nums:[], est:false};
+  }
+  return out;
+}
+function storyLabel(i, withSeq){
+  if(!story.nums || story.nums.length !== story.pages.length) story.nums = storyNumbers();
+  const t = storyType(i), n = story.nums[i] || {nums:[]};
+  let base;
+  if(t === 'cover') base = '封面';
+  else if(n.nums.length) base = (n.est ? '約' : '') + '第 ' + (n.nums.length === 2 ? n.nums[0] + '–' + n.nums[1] : n.nums[0]) + ' 頁';
+  else base = t === 'skip' ? '跳過嘅版' : '未有頁碼';
+  if(withSeq) return base === '未有頁碼' ? '第 ' + (i + 1) + ' 張' : base + '（第 ' + (i + 1) + ' 張）';
+  return base;
+}
+function storyRenumber(){ story.nums = storyNumbers(); }
+function storyBookInfo(){
+  const N = story.pages.length;
+  if(!N){ return; }
+  $('sBookInfo').textContent = '📕《' + story.name + '》' + (story.author ? ' · ' + story.author : '') + ' · 共 ' + N + ' 版（張），已準備 ' + storyReadyCount() + ' 版';
+  $('sRename').hidden = false;
+}
+function storyCoverMeta(meta){
+  if(!meta) return;
+  if(meta.title && story.autoName){ story.name = String(meta.title).trim().slice(0, 80); }
+  if(meta.author && !story.author) story.author = String(meta.author).trim().slice(0, 60);
+  if(meta.vertical && $('sDir').value === 'ltr' && !story.dirHint){ story.dirHint = true; toast('呢本書似係直排：如果係由右至左翻，喺「⚙ 講法、準備方式、頁面顯示」改翻書方向'); }
+  storyBookInfo();
+}
+
+/* ---------- 版面一覽 ---------- */
+function storyStrip(){
+  const N = story.pages.length, box = $('sStrip');
+  $('sStripBox').hidden = !N;
+  if(!N){ box.innerHTML = ''; return; }
+  storyRenumber();
+  if(story.sel >= N) story.sel = N - 1;
+  box.innerHTML = '';
+  for(let i = 0; i < N; i++){
+    const c = story.cache[i] || {};
+    const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'listitem');
+    b.className = 'st-item' + (i === story.sel ? ' sel' : '') + (i === story.idx && story.reading ? ' cur' : '');
+    const st = storyReady(i) ? (c.skip ? '⏭' : '✅') : c.state === 'loading' ? '⏳' : c.state === 'err' ? '⚠️' : '⬜';
+    if(c.img){ const im = document.createElement('img'); im.src = c.img; im.alt = ''; im.loading = 'lazy'; b.appendChild(im); }
+    else{ const ph = document.createElement('span'); ph.className = 'ph'; ph.textContent = '📄'; b.appendChild(ph); }
+    const l = document.createElement('span'); l.className = 'lb2'; l.textContent = st + ' ' + storyLabel(i); b.appendChild(l);
+    const q = document.createElement('span'); q.className = 'sq'; q.textContent = '第 ' + (i + 1) + ' 張' + (storyIsSpread(i) ? '・兩版' : ''); b.appendChild(q);
+    b.setAttribute('aria-label', storyLabel(i, true) + '，' + {'✅':'準備好', '⏭':'跳過', '⏳':'準備緊', '⚠️':'出錯', '⬜':'未準備'}[st]);
+    b.onclick = function(){ story.sel = i; $('sStartSel').value = String(i + 1); storyStrip(); };
+    box.appendChild(b);
+  }
+  storySelBar();
+}
+function storySelBar(){
+  const i = story.sel, N = story.pages.length;
+  $('sSelBar').hidden = !(i >= 0 && i < N);
+  if($('sSelBar').hidden) return;
+  const pg = story.pages[i];
+  $('sSelTxt').textContent = '揀咗：' + storyLabel(i, true) + '　' + (pg.spread === true ? '（你設定咗：左右兩版）' : pg.spread === false ? '（你設定咗：一版）' : '（一版定兩版：自動）')
+    + (Array.isArray(pg.printed) ? '　頁碼係你改過嘅' : '');
+  $('sSelLeft').disabled = i === 0; $('sSelRight').disabled = i === N - 1;
+}
+function storyBusyGen(){ return Object.keys(story.cache).some(function(k){ return story.cache[k] && story.cache[k].state === 'loading'; }); }
+function storyReorder(order){
+  if(storyBusyGen()){ toast('等準備緊嗰版做完先，或者先撳「⏸ 暫停準備」'); return false; }
+  const P = order.map(function(o){ return story.pages[o]; }), C = {};
+  order.forEach(function(o, n){ if(story.cache[o]) C[n] = story.cache[o]; });
+  const io = story.idx, so = story.sel;
+  story.pages = P; story.cache = C;
+  story.idx = order.indexOf(io); story.sel = order.indexOf(so);
+  storyRefreshUI(); if(story.idx >= 0) storyRenderSpread();
+  return true;
+}
+function storyInsertAt(i, pg, entry){
+  const order = story.pages.map(function(_, k){ return k; });
+  const C = {}, P = story.pages.slice();
+  P.splice(i, 0, pg);
+  Object.keys(story.cache).forEach(function(k){ const n = +k; C[n >= i ? n + 1 : n] = story.cache[k]; });
+  C[i] = entry;
+  story.pages = P; story.cache = C;
+  if(story.idx >= i) story.idx++; if(story.sel >= i) story.sel++;
+  return order;
+}
+
+/* ---------- 用鏡頭逐版影 ---------- */
+let sStream = null;
+async function sCamStart(){
+  const v = $('sVideo'), msg = $('sCamMsg');
+  if(sStream) return true;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ msg.textContent = '呢度開唔到即時鏡頭，撳「用相機 app」影。'; return false; }
+  msg.hidden = false; msg.textContent = '開緊鏡頭…';
+  try{
+    sStream = await navigator.mediaDevices.getUserMedia({audio:false, video:{facingMode:{ideal:'environment'}, width:{ideal:3840}, height:{ideal:2160}}});
+    v.srcObject = sStream; await v.play().catch(function(){});
+    msg.hidden = true;
+    try{ if(navigator.wakeLock && !story.wake) story.wake = await navigator.wakeLock.request('screen'); }catch(e){}
+    return true;
+  }catch(e){
+    sStream = null;
+    msg.textContent = (e && e.name === 'NotAllowedError') ? '你冇俾用鏡頭。可以撳「用相機 app」影。' : '開唔到鏡頭，撳「用相機 app」影。';
+    return false;
+  }
+}
+function sCamStop(){
+  if(sStream){ sStream.getTracks().forEach(function(t){ t.stop(); }); sStream = null; }
+  $('sVideo').srcObject = null; $('sCamMsg').hidden = false; $('sCamMsg').textContent = '鏡頭已經熄咗';
+  if(story.wake){ try{ story.wake.release(); }catch(e){} story.wake = null; }
+}
+function sCapInfo(){
+  const N = story.pages.length;
+  $('sCapInfo').textContent = story.retake !== null && story.retake !== undefined && story.pages[story.retake]
+    ? '📷 下一張會換走：' + storyLabel(story.retake, true)
+    : N ? '已影 ' + N + ' 張。最新一張：' + storyLabel(N - 1, true) + '。一張影一版或者左右兩版都得。'
+        : '先影封面（AI 會認出書名），再逐版影。一張影一版或者左右兩版都得。';
+  $('sShotLbl').textContent = story.retake !== null && story.retake !== undefined ? '重影呢版' : '影下一版';
+}
+function sCapOpen(){ $('sCap').hidden = false; sCamStart(); sCapInfo(); $('sCap').scrollIntoView({behavior:'smooth', block:'start'}); }
+function sCapClose(){ $('sCap').hidden = true; sCamStop(); story.retake = null; }
+function storyNewCameraBook(asCover){
+  storyResetBook();
+  story.source = 'camera'; story.autoName = true; story.author = '';
+  story.name = asCover ? '（認緊書名…）' : '影相書 ' + new Date().toLocaleDateString('zh-HK');
+  story.key = storyKey(storyOpts()); story.lang = storyOpts().lang;
+}
+function storyAddShot(pic, asCover){
+  if(!pic) return;
+  const entry = {img:pic.url, w:pic.w, h:pic.h};
+  let i;
+  if(story.retake !== null && story.retake !== undefined && story.pages[story.retake]){
+    i = story.retake; story.retake = null;
+    const old = story.pages[i];
+    story.pages[i] = {kind:'data', isCover:!!old.isCover, spread:null};
+    story.cache[i] = entry;
+    toast('換咗：第 ' + (i + 1) + ' 張');
+  }else{
+    if(!story.pages.length) storyNewCameraBook(asCover);
+    if(asCover){
+      if(story.pages.length && story.pages[0].isCover){ i = 0; story.pages[0] = {kind:'data', isCover:true, spread:false}; story.cache[0] = entry; }
+      else{ if(storyBusyGen()){ toast('等準備緊嗰版做完先'); return; } storyInsertAt(0, {kind:'data', isCover:true, spread:false}, entry); i = 0; }
+      story.autoName = story.autoName !== false;
+    }else{
+      story.pages.push({kind:'data', isCover:false, spread:null}); i = story.pages.length - 1; story.cache[i] = entry;
+    }
+  }
+  beep(880, 100);
+  storyRefreshUI(); sCapInfo();
+  if(!cfgReady()) return;
+  if(asCover || story.pages[i].isCover){ story.key = story.key || storyKey(storyOpts()); storyGen(i); }   /* 封面即刻睇，認書名 */
+  if($('sMode').value === 'all') storyBatchRun();
+  else if(story.reading) storyPrefetchAhead();
+  if(story.reading && i === story.idx) storyGo(i);
+}
+async function sShoot(asCover){
+  ttsUnlock();
+  const v = $('sVideo');
+  if(!sStream || !v.videoWidth){
+    if(!(await sCamStart()) || !v.videoWidth){ story.capCover = asCover; $('sCapFile').click(); return; }
+  }
+  storyAddShot(toJpeg(v, 0, 0, v.videoWidth, v.videoHeight, 1600), asCover);
+}
+async function storyAddFile(file, asCover){
+  if(!file) return;
+  const kind = await sniff(file);
+  if(!/^(image|heic|tiff)$/.test(kind)){ toast('呢個唔係相'); return; }
+  try{
+    const dec = await decodeAny({kind:kind, file:file, name:file.name || ''});
+    let pic; try{ pic = toJpeg(dec.src, 0, 0, dec.w, dec.h, 1600); }finally{ freeDecoded(dec); }
+    storyAddShot(pic, asCover);
+  }catch(e){ toast('讀唔到張相：' + (e.message || e)); }
+}
+
+function sSetStatus(t){ $('sStatus').textContent = t; }
+function storyReady(i){ const c = story.cache[i]; return !!(c && c.state === 'done' && c.key === story.key); }
+function storyCtrl(){ if(!story.genCtrl || story.genCtrl.signal.aborted) story.genCtrl = new AbortController(); return story.genCtrl; }
+function storyReadyCount(){ let n = 0; for(let i = 0; i < story.pages.length; i++) if(storyReady(i)) n++; return n; }
+function storyResetBook(){
+  storyHaltAll();
+  story.pages = []; story.cache = {}; story.idx = -1; story.sel = -1; story.name = ''; story.author = ''; story.source = ''; story.autoName = false;
+  story.spent = 0; story.retake = null; story.nums = null; story.dirHint = false;
+  $('sStage').hidden = true; $('sRename').hidden = true;
+}
+
+/* ---------- 開書：PDF、相片，或者匯出過嘅 .睇書.json ---------- */
+async function storyLoad(files){
+  const arr = Array.prototype.slice.call(files || []);
+  if(!arr.length) return;
+  const js = arr.find(function(f){ return /\.json$/i.test(f.name || '') || f.type === 'application/json'; });
+  if(js){ await storyImport(js, arr.filter(function(f){ return f !== js; })); return; }
+  if(story.pages.length && !story.pending){
+    const kinds = await Promise.all(arr.map(sniff));
+    if(kinds.every(function(k){ return /^(image|heic|tiff)$/.test(k); })
+       && confirm('加呢 ' + arr.length + ' 張相落而家呢本《' + story.name + '》？\n（撳「取消」就當係一本新書）')){
+      arr.map(function(f, i){ return {f:f, k:kinds[i]}; }).sort(function(a, b){ return (a.f.name || '').localeCompare(b.f.name || '', undefined, {numeric:true}); })
+        .forEach(function(x){ story.pages.push({kind:'img', file:x.f, k:x.k, spread:null}); });
+      storyRefreshUI();
+      if($('sMode').value === 'all') storyBatchRun();
+      return;
+    }
+  }
+  await storyLoadBook(arr);
+}
+async function storyLoadBook(arr){
+  const pending = story.pending;
+  storyResetBook();
+  $('sBookInfo').textContent = '⏳ 讀緊…';
+  try{
+    const kinds = await Promise.all(arr.map(sniff));
+    const pi = kinds.indexOf('pdf');
+    if(pi >= 0){
+      const lib = await getPdfJs();
+      const doc = await lib.getDocument({data:await arr[pi].arrayBuffer(), isEvalSupported:false}).promise;
+      story.name = arr[pi].name.replace(/\.pdf$/i, ''); story.source = 'pdf'; story.autoName = false;
+      for(let n = 1; n <= doc.numPages; n++) story.pages.push({kind:'pdf', doc:doc, n:n});
+    }else{
+      const imgs = arr.map(function(f, i){ return {f:f, k:kinds[i]}; }).filter(function(x){ return /^(image|heic|tiff)$/.test(x.k); })
+        .sort(function(a, b){ return (a.f.name || '').localeCompare(b.f.name || '', undefined, {numeric:true}); });
+      if(!imgs.length) throw new Error('揀嘅檔唔係 PDF、相或者 .睇書.json');
+      story.name = imgs.length === 1 ? imgs[0].f.name.replace(/\.[a-z0-9]+$/i, '') : '書頁相片';
+      imgs.forEach(function(x){ story.pages.push({kind:'img', file:x.f, k:x.k, spread:null}); });
+      story.source = 'img'; story.autoName = imgs.length > 1;
+    }
+    story.key = storyKey(storyOpts()); story.lang = storyOpts().lang;
+    storyBookInfo();
+    if(pending){
+      if(pending.pages.length === story.pages.length){ storyApplyTexts(pending); story.name = pending.name || story.name; story.author = pending.author || story.author; storyBookInfo(); toast('套用咗逐字稿：已準備 ' + storyReadyCount() + ' 版'); }
+      else $('sBookInfo').textContent += '　⚠ 張數同逐字稿（' + pending.pages.length + ' 張）對唔上，冇套用逐字稿';
+    }
+  }catch(e){
+    $('sBookInfo').textContent = '❌ ' + (/password/i.test(String(e && (e.name + e.message))) ? '呢個 PDF 有密碼，開唔到' : (e.message || e));
+  }
+  storyRefreshUI();
+}
+function storyApplyTexts(data){
+  data.pages.forEach(function(p, i){
+    const c = story.cache[i] = story.cache[i] || {};
+    if(p.img && !c.img){ c.img = p.img; c.w = p.w; c.h = p.h; }
+    if(p.meta) c.meta = p.meta;
+    if(p.text || p.skip){ c.text = p.text || ''; c.skip = !!p.skip; c.state = 'done'; c.key = story.key; }
+    const pg = story.pages[i];
+    if(pg){ if(Array.isArray(p.printed)) pg.printed = p.printed; if(p.spread === true || p.spread === false) pg.spread = p.spread; if(p.isCover) pg.isCover = true; }
+  });
+  if(data.dir === 'rtl' || data.dir === 'ltr'){ $('sDir').value = data.dir; cfgPatch('sDir', data.dir); }
+  if(data.lastPage >= 0) story.startWant = Math.min(story.pages.length, data.lastPage + 1);
+}
+async function storyImport(file, others){
+  let data;
+  try{ data = JSON.parse(await file.text()); }catch(e){ $('sBookInfo').textContent = '❌ 呢個 .json 讀唔到'; return; }
+  if(!data || data.app !== 'glm-vision-book' || !Array.isArray(data.pages)){ $('sBookInfo').textContent = '❌ 呢個唔係由呢個 app 匯出嘅書'; return; }
+  /* 用返嗰陣嘅講法設定，咁逐字稿先對得上 */
+  const st = data.settings || {};
+  if(STORY_AGE[st.age]) $('sAge').value = st.age;
+  if(/^(tell|read|teach)$/.test(st.style)) $('sStyle').value = st.style;
+  if(/^(yue|en|cmn)$/.test(st.lang)) $('sLang').value = st.lang;
+  $('sAskKid').checked = !!st.ask;
+  ['sAge', 'sStyle', 'sLang'].forEach(function(id){ cfgPatch(id, $(id).value); }); cfgPatch('sAskKid', $('sAskKid').checked);
+  const hasImgs = data.pages.every(function(p){ return !!p.img; });
+  if(hasImgs){
+    storyResetBook();
+    story.name = data.name || '匯入嘅書'; story.author = data.author || ''; story.source = data.source || 'data'; story.autoName = false;
+    story.key = storyKey(storyOpts()); story.lang = storyOpts().lang;
+    story.pages = data.pages.map(function(){ return {kind:'data', spread:null}; });
+    storyApplyTexts(data);
+    storyBookInfo();
+    const left = story.pages.length - storyReadyCount();
+    toast('📥 匯入咗《' + story.name + '》' + (left ? '：仲有 ' + left + ' 版未準備' : '：全部準備好'));
+  }else{
+    story.pending = data;
+    if(others.length){ await storyLoadBook(others); story.pending = null; }
+    else{ storyResetBook(); story.pending = data; $('sBookInfo').textContent = '📥 呢個係淨係逐字稿嘅檔（《' + (data.name || '') + '》' + data.pages.length + ' 張）。請再揀返同一本書嘅 PDF 或者相片，就會自動套用。'; }
+  }
+  storyRefreshUI();
+}
+
+/* ---------- 匯出 ---------- */
+function storyDownload(name, blob){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+}
+function storySafeName(){ return (story.name || '書').replace(/[\\/:*?"<>|]+/g, '_').slice(0, 60); }
+async function storyExport(withImgs){
+  if(!story.pages.length){ toast('未有書'); return; }
+  if(withImgs){
+    for(let i = 0; i < story.pages.length; i++){
+      if(!(story.cache[i] && story.cache[i].img)){
+        $('sBookInfo').textContent = '⏳ 整緊頁面圖 ' + (i + 1) + '／' + story.pages.length + '…';
+        try{ await storyImg(i); }catch(e){ toast('第 ' + (i + 1) + ' 頁整唔到圖'); return; }
+      }
+    }
+  }
+  const o = storyOpts();
+  if(!withImgs && story.pages.some(function(pg){ return pg.kind === 'data'; })){ toast('呢本書有鏡頭影嘅版，冇原本檔案可以揀返，要用「匯出成本書（連頁面）」'); return; }
+  const data = {app:'glm-vision-book', v:2, name:story.name, author:story.author, source:story.source, dir:$('sDir').value,
+    settings:{age:o.age, style:o.style, lang:o.lang, ask:o.ask},
+    pageCount:story.pages.length, done:storyReadyCount(), lastPage:story.idx >= 0 ? story.idx : story.sel, exported:new Date().toISOString(),
+    pages:story.pages.map(function(pg, i){
+      const c = story.cache[i] || {}, ok = storyReady(i);
+      const p = {text:ok ? (c.text || '') : '', skip:ok ? !!c.skip : false, meta:c.meta || null, label:storyLabel(i)};
+      if(Array.isArray(pg.printed)) p.printed = pg.printed;
+      if(pg.spread === true || pg.spread === false) p.spread = pg.spread;
+      if(pg.isCover) p.isCover = true;
+      if(withImgs){ p.img = c.img; p.w = c.w; p.h = c.h; }
+      return p;
+    })};
+  const blob = new Blob([JSON.stringify(data)], {type:'application/json'});
+  storyDownload(storySafeName() + (withImgs ? '' : '（逐字稿）') + '.睇書.json', blob);
+  storyBookInfo();
+  toast('💾 匯出咗（' + kb(blob.size) + '，已準備 ' + data.done + '／' + data.pageCount + ' 版）。下次喺呢度揀返呢個檔就得。');
+}
+function storyExportTxt(){
+  if(!story.pages.length){ toast('未有書'); return; }
+  storyRenumber();
+  const parts = ['《' + story.name + '》' + (story.author ? '　' + story.author : ''), '匯出時間：' + new Date().toLocaleString('zh-HK'), ''];
+  const todo = story.pages.map(function(_, i){ return i; }).filter(function(i){ return !storyReady(i); });
+  if(todo.length) parts.push('未準備（' + todo.length + ' 版）：' + todo.map(function(i){ return storyLabel(i, true); }).join('、'), '');
+  story.pages.forEach(function(_, i){
+    const c = story.cache[i] || {};
+    parts.push('＝＝ ' + storyLabel(i, true) + ' ＝＝');
+    parts.push(!storyReady(i) ? '（未準備）' : c.skip ? '（跳過：版權頁、空白頁之類）' : c.text, '');
+  });
+  storyDownload(storySafeName() + '_逐字稿.txt', new Blob(['﻿' + parts.join('\n').replace(/\r?\n/g, '\r\n')], {type:'text/plain;charset=utf-8'}));
+}
+
+/* ---------- 頁面圖 ---------- */
+async function storyImg(i){
+  const c = story.cache[i] = story.cache[i] || {};
+  if(c.img) return c;
+  const pg = story.pages[i];
+  if(!pg || pg.kind === 'data') throw new Error('冇頁面圖');
+  if(c.imgP) return c.imgP;
+  c.imgP = (async function(){
+    let pic;
+    if(pg.kind === 'pdf'){ const cv = await pdfPageCanvas(pg.doc, pg.n, 1600); pic = toJpeg(cv, 0, 0, cv.width, cv.height, 1600); cv.width = cv.height = 0; }
+    else{ const dec = await decodeAny({kind:pg.k, file:pg.file, name:pg.file.name || ''}); try{ pic = toJpeg(dec.src, 0, 0, dec.w, dec.h, 1600); }finally{ freeDecoded(dec); } }
+    c.img = pic.url; c.w = pic.w; c.h = pic.h; c.imgP = null;
+    return c;
+  })();
+  return c.imgP;
+}
+/* 單頁定雙頁、封面、翻書方向 */
+function storyDouble(){
+  const v = $('sView').value;
+  if(v === 'single') return false;
+  if(v === 'double') return true;
+  return innerWidth >= 900 || (innerWidth > innerHeight && innerWidth >= 700);
+}
+/* 雙頁顯示：一張相已經有左右兩版就自己成組；淨係一版嘅相就兩張兩張砌埋 */
+function storyGroups(){
+  const N = story.pages.length, g = []; let i = 0;
+  if(N && $('sCover').value === 'alone'){ g.push([0]); i = 1; }
+  while(i < N){
+    if(storyIsSpread(i)){ g.push([i]); i++; }
+    else if(i + 1 < N && !storyIsSpread(i + 1)){ g.push([i, i + 1]); i += 2; }
+    else{ g.push([i]); i++; }
+  }
+  return g;
+}
+function storySpread(i){
+  if(!storyDouble() || story.pages.length < 2) return [i];
+  return storyGroups().find(function(x){ return x.indexOf(i) >= 0; }) || [i];
+}
+function storyRenderSpread(){
+  if(story.idx < 0) return;
+  const box = $('sSpread'), rtl = $('sDir').value === 'rtl';
+  const sp = storySpread(story.idx), order = rtl ? sp.slice().reverse() : sp;
+  box.innerHTML = ''; box.classList.toggle('two', order.length === 2);
+  order.forEach(function(j){
+    const fig = document.createElement('figure'); fig.className = 'pg' + (j === story.idx ? ' cur' : '');
+    const im = document.createElement('img'); im.alt = '第 ' + (j + 1) + ' 頁' + (j === story.idx ? '（講緊呢頁）' : '');
+    const c = story.cache[j];
+    if(c && c.img) im.src = c.img;
+    else storyImg(j).then(function(cc){ im.src = cc.img; }).catch(function(){});
+    const cap = document.createElement('figcaption'); cap.textContent = storyLabel(j);
+    fig.append(im, cap);
+    if(j !== story.idx){ fig.title = '撳一下講呢頁'; fig.onclick = function(){ storyGo(j); }; }
+    box.appendChild(fig);
+  });
+  $('sPageLbl').textContent = storyLabel(story.idx, true) + '　共 ' + story.pages.length + ' 張' + (order.length === 2 ? '（雙頁顯示）' : storyIsSpread(story.idx) ? '（一張相有兩版）' : '');
+  $('sCtl').classList.toggle('rtl', rtl);
+}
+
+/* ---------- 準備一頁（叫 AI） ---------- */
+function storyPrevText(i){
+  for(let j = i - 1; j >= 0 && j >= i - 3; j--){ const c = story.cache[j]; if(c && c.state === 'done' && c.key === story.key && !c.skip && c.text) return c.text.slice(-400); }
+  return '';
+}
+function storyGen(i){
+  const c = story.cache[i] = story.cache[i] || {};
+  if(storyReady(i)) return Promise.resolve();
+  if(c.promise && c.key === story.key) return c.promise;
+  const ctrl = storyCtrl(), o = storyOpts(), key = story.key;
+  c.key = key; c.state = 'loading'; c.text = ''; c.skip = false; c.err = null;
+  c.promise = (async function(){
+    try{
+      await storyImg(i);
+      if(i === story.idx) storyRenderSpread();
+      const prev = storyPrevText(i);
+      const pg = story.pages[i] || {};
+      const head = '書名：《' + story.name + '》' + (story.author ? '，作者：' + story.author : '') + '。翻書方向：'
+                 + ($('sDir').value === 'rtl' ? '由右至左（直排書）' : '由左至右') + '。而家係第 ' + (i + 1) + ' 張（共 ' + story.pages.length + ' 張）'
+                 + (pg.isCover ? '，係封面' : '') + '。'
+                 + (prev ? '\n上一版講到：' + prev : '\n呢張係開始講嘅第一張。');
+      const res = await callVision([{role:'system', content:storySys(o)}, {role:'user', content:[{type:'text', text:head}, {type:'image_url', image_url:{url:c.img}}]}],
+        {temp:0.5, signal:ctrl.signal,
+         onNote:function(m){ if(i === story.idx) sSetStatus('⏳ ' + m); },
+         onDelta:function(d){ if(d.text && c.key === key){ const ps = storyParse(d.text); c.text = ps.body; if(ps.meta) c.meta = ps.meta; if(i === story.idx) storyOnText(i, false); } }});
+      if(c.key !== key) return;
+      const raw = String(res.text || '').trim(), ps = storyParse(raw);
+      c.text = ps.partial ? raw.replace(/^@@[^\n]*\n?/, '').trim() : ps.body;
+      if(ps.meta) c.meta = ps.meta;
+      c.skip = (c.meta && c.meta.type === 'skip') || /^【?\s*跳過\s*】?[。.]?$/.test(c.text);
+      if((c.meta && c.meta.type === 'cover') || pg.isCover) storyCoverMeta(c.meta);
+      c.state = 'done'; c.usage = res.usage; c.fails = 0;
+      if(res.usage) story.spent += costOf(res.usage.prompt_tokens || 0, res.usage.completion_tokens || 0);
+      if(i === story.idx) storyOnText(i, true);
+    }catch(e){
+      c.promise = null;
+      if(e.stopped || ctrl.signal.aborted){ c.state = 'idle'; return; }
+      c.state = 'err'; c.err = e; c.fails = (c.fails || 0) + 1;
+      if(i === story.idx){ sSetStatus('❌ ' + storyLabel(i, true) + ' 出錯：' + String(e.message || e).split('\n')[0] + '　撳 🔁 再試。'); ttsCue('呢頁出錯'); }
+    }finally{
+      c.promise = null;
+      storyPrefetchAhead(); storyProgress(); storyStrip(); storyStartOptions(); storyBookInfo();
+      if(i === story.idx) storyRenderSpread();
+    }
+  })();
+  return c.promise;
+}
+/* ① 邊讀邊準備：淨係準備講緊嗰頁之後嘅一至兩頁，逐頁接住做 */
+function storyAhead(){ const m = $('sMode').value; return m === 'ahead2' ? 2 : m === 'ahead1' ? 1 : 0; }
+function storyPrefetchAhead(){
+  if(!story.reading || story.idx < 0) return;
+  const n = storyAhead(); if(!n) return;
+  for(let j = story.idx + 1; j <= Math.min(story.pages.length - 1, story.idx + n); j++){
+    if(storyReady(j)) continue;
+    const c = story.cache[j];
+    if(c && c.state === 'loading') return;
+    if(c && c.state === 'err' && (c.fails || 0) >= 2) continue;
+    storyGen(j); return;
+  }
+}
+/* ② 一次過準備全本：由講緊嗰頁向後做，做完再返轉頭做前面未做嘅 */
+async function storyBatchRun(){
+  if(story.batchOn || !story.pages.length) return;
+  if(!cfgReady()){ toast('未設定好 AI'); openCfg(); return; }
+  story.key = storyKey(storyOpts()); story.lang = storyOpts().lang;
+  story.batchOn = true; story.batchPaused = false; storyProgress();
+  try{
+    while(!story.batchPaused){
+      const N = story.pages.length, anchor = Math.max(0, story.idx);
+      let j = -1;
+      for(let k = 0; k < N; k++){
+        const x = (anchor + k) % N, c = story.cache[x];
+        if(storyReady(x) || (c && (c.fails || 0) >= 3)) continue;
+        j = x; break;
+      }
+      if(j < 0) break;
+      await storyGen(j);
+      const c = story.cache[j];
+      if(c && c.state === 'err' && !story.batchPaused) await sleep(3000).catch(function(){});
+    }
+  }finally{
+    story.batchOn = false; storyProgress();
+  }
+}
+function storyProgress(){
+  const N = story.pages.length, done = storyReadyCount();
+  const all = $('sMode').value === 'all';
+  $('sBatchOnly').hidden = !(all && N);
+  $('sExportRow').hidden = !N;
+  const show = N && (all || story.batchOn || (done > 0 && done < N && $('sMode').value === 'all'));
+  $('sBatch').hidden = !show;
+  if(!show) return;
+  $('sBatchBar').style.width = (N ? done / N * 100 : 0) + '%';
+  const failed = story.pages.filter(function(_, i){ const c = story.cache[i]; return c && !storyReady(i) && (c.fails || 0) >= 3; }).length;
+  $('sBatchTxt').textContent = '已準備 ' + done + '／' + N + ' 版'
+    + (story.spent ? '，今次用咗 ' + fmtUSD(story.spent) : '')
+    + (failed ? '，' + failed + ' 版試咗三次都唔得' : '')
+    + (story.batchOn ? (story.batchPaused ? '（停緊，做完手上嗰頁就停）' : '（準備緊…）') : (done === N ? '　✅ 全本準備好，可以匯出' : ''));
+  const b = $('sBatchBtn');
+  b.hidden = done === N && !story.batchOn;
+  b.textContent = story.batchOn && !story.batchPaused ? '⏸ 暫停準備' : '▶ ' + (done ? '繼續準備' : '開始準備全本');
+}
+
+/* ---------- 講 ---------- */
+function storyOnText(i, final){
+  const c = story.cache[i]; if(!c) return;
+  const speak = cfg().qSpeak === 'app' && ttsSupported() && story.reading;
+  if(final && c.skip){
+    $('sText').textContent = '（呢頁冇故事內容，跳過）';
+    sSetStatus('⏭ ' + storyLabel(i, true) + ' 冇故事內容，跳過');
+    if(story.reading && $('sAuto').checked && !story.hold) setTimeout(function(){ if(story.idx === i && !story.hold) storyGo(i + 1); }, 600);
+    return;
+  }
+  if(!final && /^【?跳/.test(c.text)) return;
+  $('sText').textContent = c.text;
+  if(final){
+    sSetStatus((speak ? '🔊 講緊 ' : '✅ ') + storyLabel(i, true)
+      + (c.usage ? ' · ' + fmtUSD(costOf(c.usage.prompt_tokens || 0, c.usage.completion_tokens || 0)) : ''));
+    if(speak) tts.onDone = function(){ storyAfterRead(i); };
+    else if(story.reading && cfg().qSpeak === 'sr'){ $('sLive').textContent = ''; setTimeout(function(){ $('sLive').textContent = c.text; }, 80); }
+  }else sSetStatus('🔊 講緊' + storyLabel(i, true) + '…');
+  if(speak && !story.hold) ttsFeed(c.text, final);
+}
+function storyAfterRead(i){
+  if(i !== story.idx || story.hold || !story.reading) return;
+  if(i + 1 >= story.pages.length){ sSetStatus('📕 成本書講完喇。'); ttsCue(story.lang === 'en' ? 'The end.' : '講完喇'); return; }
+  if(!$('sAuto').checked){ sSetStatus('讀完' + storyLabel(i, true) + '，撳「下一頁」揭頁。'); return; }
+  setTimeout(function(){ if(story.idx === i && !story.hold && story.reading) storyGo(i + 1); }, 900);
+}
+function storyGo(i){
+  if(!story.pages.length) return;
+  if(i < 0 || i >= story.pages.length){ toast(i < 0 ? '已經係第一張' : '已經係最後一張'); return; }
+  if(!cfgReady()){ toast('未設定好 AI'); openCfg(); return; }
+  story.reading = true; story.idx = i; story.sel = i; story.hold = false;
+  ttsReset(); tts.lang = story.lang;
+  $('sPause').textContent = '⏸ 暫停';
+  $('sStage').hidden = false;
+  $('sText').textContent = '';
+  fu.thread = []; fu.sel = null;
+  storyRenderSpread();
+  const c = story.cache[i];
+  if(storyReady(i)) storyOnText(i, true);
+  else if(c && c.state === 'loading' && c.key === story.key){ sSetStatus('⏳ 準備緊' + storyLabel(i, true) + '…'); if(c.text) storyOnText(i, false); }
+  else{ sSetStatus('⏳ 睇緊' + storyLabel(i, true) + '…'); storyGen(i); }
+  storyPrefetchAhead();
+  storyProgress(); storyStrip();
+  fuRender();
+}
+function storyHoldOn(){
+  story.hold = true; tts.token++; tts.speaking = false; tts.paused = true;
+  if(ttsSupported()) speechSynthesis.cancel();
+  $('sPause').textContent = '▶ 繼續';
+}
+/* 停讀：一次過準備全本嗰陣，準備會繼續；邊讀邊準備就連準備都停埋，慳 token */
+function storyHalt(){
+  story.reading = false; story.hold = true;
+  ttsReset();
+  if(!story.batchOn && story.genCtrl){ story.genCtrl.abort(); story.genCtrl = null; }
+}
+function storyHaltAll(){
+  story.batchPaused = true; story.reading = false; story.hold = true;
+  if(story.genCtrl){ story.genCtrl.abort(); story.genCtrl = null; }
+  ttsReset();
+}
+function storyRefreshUI(){
+  const o = storyOpts(), N = story.pages.length;
+  const inT = Math.round((imgTokens(1131, 1600) + 1100 + 300) * calFactor());
+  const outT = thinkTokens() + ({k:250, p1:400, p4:600, adult:700}[o.age] || 400) + (o.style === 'teach' ? 300 : 0);
+  const per = costOf(inT, outT), left = N ? N - storyReadyCount() : 0;
+  $('sEst').textContent = '估計每頁大約 ' + n0(inT) + ' → ' + n0(outT) + ' token（' + fmtUSD(per) + '）'
+    + (N ? '，成本書 ' + N + ' 頁大約 ' + fmtUSD(per * N) + (left < N ? '（未準備嘅 ' + left + ' 頁大約 ' + fmtUSD(per * left) + '）' : '') + '。' : '。')
+    + ({ahead1:' 邊讀邊準備：最多預先做多一頁，停咗唔會再用。', ahead2:' 邊讀邊準備：最多預先做多兩頁，停咗唔會再用。', all:' 一次過準備全本：會一路做到成本書完，撳「⏸ 暫停準備」先停。'}[$('sMode').value]);
+  const vs = langVoices(o.lang), v = ttsVoice(o.lang);
+  $('sVoiceNote').textContent = !ttsSupported() ? '呢個 browser 讀唔到字。'
+    : !vs.length ? '⚠ 部機未有' + {yue:'廣東話', en:'英文', cmn:'普通话'}[o.lang] + '聲，會讀唔到。下載方法睇「🦯 隨身口述 → 設定」。'
+    : (v && !v.localService) ? '⚠ 用緊嘅聲（' + v.name + '）要上網合成，讀嘅文字會送去 browser 公司。'
+    : '🔊 會用「' + v.name + '」喺部機讀。讀法、語速跟「🦯 隨身口述 → 設定」。';
+  $('sGo').textContent = '▶ 開始講';
+  storyRenumber(); storyStartOptions(); storyStrip(); storyBookInfo();
+  $('sExpLite').disabled = story.pages.some(function(pg){ return pg.kind === 'data'; });
+  $('sExpLite').title = $('sExpLite').disabled ? '有鏡頭影嘅版，冇原本檔案可以揀返，要連頁面匯出' : '';
+  storyProgress();
+}
+function storyStartOptions(){
+  const sel = $('sStartSel'), N = story.pages.length;
+  const cur = story.startWant || parseInt(sel.value, 10) || (story.sel >= 0 ? story.sel + 1 : 1);
+  story.startWant = 0;
+  sel.innerHTML = '';
+  if(!N){ const o = document.createElement('option'); o.value = '1'; o.textContent = '第一版'; sel.appendChild(o); return; }
+  for(let i = 0; i < N; i++){
+    const o = document.createElement('option'); o.value = String(i + 1);
+    o.textContent = (i + 1) + '. ' + storyLabel(i) + (storyReady(i) ? ' ✅' : '');
+    sel.appendChild(o);
+  }
+  sel.value = String(Math.min(N, Math.max(1, cur)));
+}
+
+/* ---------- 掣 ---------- */
+$('sDrop').onclick = function(){ $('sFile').click(); };
+$('sDrop').onkeydown = function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('sFile').click(); } };
+['dragenter', 'dragover'].forEach(function(t){ $('sDrop').addEventListener(t, function(e){ e.preventDefault(); e.stopPropagation(); $('sDrop').classList.add('over'); }); });
+['dragleave', 'drop'].forEach(function(t){ $('sDrop').addEventListener(t, function(e){ e.preventDefault(); e.stopPropagation(); $('sDrop').classList.remove('over'); }); });
+$('sDrop').addEventListener('drop', function(e){ storyLoad(e.dataTransfer && e.dataTransfer.files); });
+$('sFile').onchange = function(){ storyLoad(this.files); this.value = ''; };
+$('sGo').onclick = function(){
+  ttsUnlock();
+  if(!story.pages.length){ $('sFile').click(); return; }
+  if(!cfgReady()){ toast('未設定好 AI'); openCfg(); return; }
+  const o = storyOpts(); story.key = storyKey(o); story.lang = o.lang;
+  if(!story.batchOn && story.genCtrl){ story.genCtrl.abort(); story.genCtrl = null; }
+  const start = Math.max(1, Math.min(story.pages.length, parseInt($('sStartSel').value, 10) || 1)) - 1;
+  $('sOpts').open = false;
+  storyGo(start);
+  if($('sMode').value === 'all') storyBatchRun();
+  $('sStage').scrollIntoView({behavior:'smooth', block:'start'});
+};
+$('sCapBtn').onclick = function(){ if($('sCap').hidden) sCapOpen(); else sCapClose(); };
+$('sCapDone').onclick = sCapClose;
+$('sShotCover').onclick = function(){ sShoot(true); };
+$('sShot').onclick = function(){ sShoot(false); };
+$('sShotApp').onclick = function(){ story.capCover = !story.pages.length; $('sCapFile').click(); };
+$('sCapFile').onchange = function(){ const f = this.files && this.files[0]; this.value = ''; storyAddFile(f, story.capCover); story.capCover = false; };
+$('sRename').onclick = function(){
+  const n = prompt('書名：', story.name); if(n === null) return;
+  if(n.trim()){ story.name = n.trim().slice(0, 80); story.autoName = false; }
+  const a = prompt('作者（可以留空）：', story.author || ''); if(a !== null) story.author = a.trim().slice(0, 60);
+  storyBookInfo();
+};
+$('sSelGo').onclick = function(){ $('sStartSel').value = String(story.sel + 1); $('sGo').click(); };
+$('sSelNum').onclick = function(){
+  const i = story.sel; if(i < 0) return;
+  const pg = story.pages[i];
+  const cur = Array.isArray(pg.printed) ? pg.printed.join(',') : storyPrinted(i).filter(Boolean).join(',');
+  const v = prompt('呢張（' + storyLabel(i, true) + '）書上嘅頁碼：\n一版寫一個，例如 12；左右兩版寫兩個，例如 12,13。\n留空＝用返 AI 認到嘅頁碼。', cur);
+  if(v === null) return;
+  const parts = v.split(/[,，、\s]+/).map(function(x){ return x.trim(); }).filter(Boolean).slice(0, 2);
+  pg.printed = parts.length ? parts : undefined;
+  if(parts.length) pg.spread = parts.length === 2;
+  storyRefreshUI(); if(story.idx >= 0) storyRenderSpread();
+};
+$('sSelSpread').onclick = function(){
+  const pg = story.pages[story.sel]; if(!pg) return;
+  pg.spread = pg.spread === null || pg.spread === undefined ? !storyIsSpread(story.sel) : pg.spread ? false : null;
+  storyRefreshUI(); if(story.idx >= 0) storyRenderSpread();
+};
+function storyMoveSel(d){
+  const i = story.sel, j = i + d; if(i < 0 || j < 0 || j >= story.pages.length) return;
+  const order = story.pages.map(function(_, k){ return k; }); order[i] = j; order[j] = i;
+  if(storyReorder(order)) story.sel = j, storyStrip();
+}
+$('sSelLeft').onclick = function(){ storyMoveSel(-1); };
+$('sSelRight').onclick = function(){ storyMoveSel(1); };
+$('sSelRetake').onclick = function(){ if(story.sel < 0) return; story.retake = story.sel; sCapOpen(); };
+$('sSelDel').onclick = function(){
+  const i = story.sel; if(i < 0) return;
+  if(!confirm('刪除 ' + storyLabel(i, true) + '？')) return;
+  if(i === story.idx) storyHalt();
+  const order = story.pages.map(function(_, k){ return k; }).filter(function(k){ return k !== i; });
+  const wasIdx = story.idx;
+  if(storyReorder(order)){
+    if(wasIdx === i){ story.idx = -1; $('sStage').hidden = true; }
+    story.sel = Math.min(i, story.pages.length - 1); storyStrip();
+    if(!story.pages.length) storyResetBook();
+  }
+};
+$('sSort').onclick = function(){
+  storyRenumber();
+  const keyOf = function(i){
+    if(storyType(i) === 'cover') return -1;
+    const n = story.nums[i]; if(n && n.nums.length && !n.est){ const v = parseInt(n.nums[0], 10); if(!isNaN(v)) return v; }
+    return null;
+  };
+  const N = story.pages.length, idx = story.pages.map(function(_, i){ return i; });
+  const known = idx.filter(function(i){ return keyOf(i) !== null; });
+  if(known.length < 2){ toast('認到頁碼嘅版太少，排唔到。可以先準備多啲版，或者自己改頁碼。'); return; }
+  /* 冇頁碼嘅版跟住佢前面嗰版走 */
+  const order = []; const sorted = known.slice().sort(function(a, b){ return keyOf(a) - keyOf(b) || a - b; });
+  const tail = {}; let prevK = null;
+  idx.forEach(function(i){ if(keyOf(i) !== null) prevK = i; else (tail[prevK] = tail[prevK] || []).push(i); });
+  (tail[null] || []).forEach(function(i){ order.push(i); });
+  sorted.forEach(function(k){ order.push(k); (tail[k] || []).forEach(function(i){ order.push(i); }); });
+  if(order.length === N && storyReorder(order)) toast('排好咗：按書上頁碼');
+};
+$('sBatchOnly').onclick = function(){ $('sOpts').open = false; storyBatchRun(); };
+$('sBatchBtn').onclick = function(){
+  if(story.batchOn && !story.batchPaused){
+    story.batchPaused = true;
+    if(!story.reading && story.genCtrl){ story.genCtrl.abort(); story.genCtrl = null; }   /* 冇讀緊就即刻停 */
+    storyProgress();
+  }else storyBatchRun();
+};
+$('sExpFull').onclick = function(){ storyExport(true); };
+$('sExpLite').onclick = function(){ storyExport(false); };
+$('sExpTxt').onclick = storyExportTxt;
+$('sPrev').onclick = function(){ ttsUnlock(); storyGo(story.idx - 1); };
+$('sNext').onclick = function(){ ttsUnlock(); storyGo(story.idx + 1); };
+$('sReplay').onclick = function(){ ttsUnlock(); storyGo(story.idx); };
+$('sStop').onclick = function(){ storyHalt(); sSetStatus('⏹ 停咗' + (story.batchOn ? '讀（全本準備仍然繼續）' : '') + '。撳「▶ 繼續」或者 🔁 就由呢頁講返。'); $('sPause').textContent = '▶ 繼續'; storyProgress(); };
+$('sPause').onclick = function(){
+  ttsUnlock();
+  if(story.hold){
+    if(!story.reading){ storyGo(story.idx); return; }
+    story.hold = false; $('sPause').textContent = '⏸ 暫停';
+    if(!storyReady(story.idx)){ storyGo(story.idx); return; }
+    if(tts.sents.length && tts.idx < tts.sents.length){ tts.paused = false; ttsPump(); }
+    else storyAfterRead(story.idx);
+  }else storyHoldOn();
+};
+$('sViewToggle').onclick = function(){
+  $('sView').value = storyDouble() ? 'single' : 'double'; cfgPatch('sView', $('sView').value); storyRenderSpread();
+};
+/* 鍵盤（電腦、iPad 鍵盤）同撥頁（手機、iPad） */
+document.addEventListener('keydown', function(e){
+  if(curView !== 'story' || story.idx < 0 || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '')) return;
+  const rtl = $('sDir').value === 'rtl';
+  if(e.key === 'ArrowRight'){ e.preventDefault(); storyGo(story.idx + (rtl ? -1 : 1)); }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); storyGo(story.idx + (rtl ? 1 : -1)); }
+});
+(function(){
+  let x0 = null, y0 = null;
+  $('sSpread').addEventListener('touchstart', function(e){ const t = e.changedTouches[0]; x0 = t.clientX; y0 = t.clientY; }, {passive:true});
+  $('sSpread').addEventListener('touchend', function(e){
+    if(x0 === null) return;
+    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0; x0 = null;
+    if(Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const rtl = $('sDir').value === 'rtl';
+    storyGo(story.idx + ((dx < 0) !== rtl ? 1 : -1));   /* 由右撥去左＝下一頁（右至左嘅書相反） */
+  }, {passive:true});
+})();
+window.addEventListener('resize', function(){ if(curView === 'story' && story.idx >= 0) storyRenderSpread(); });
+(function(){
+  const c = cfg();
+  $('sAge').value = STORY_AGE[c.sAge] ? c.sAge : 'p1';
+  $('sStyle').value = /^(tell|read|teach)$/.test(c.sStyle) ? c.sStyle : 'tell';
+  $('sLang').value = /^(yue|en|cmn)$/.test(c.sLang) ? c.sLang : 'yue';
+  $('sMode').value = /^(ahead1|ahead2|all)$/.test(c.sMode) ? c.sMode : 'ahead1';
+  $('sView').value = /^(auto|single|double)$/.test(c.sView) ? c.sView : 'auto';
+  $('sCover').value = c.sCover === 'paired' ? 'paired' : 'alone';
+  $('sDir').value = c.sDir === 'rtl' ? 'rtl' : 'ltr';
+  $('sAuto').checked = c.sAuto !== false; $('sAskKid').checked = !!c.sAskKid;
+  ['sAge', 'sStyle', 'sLang', 'sAskKid'].forEach(function(id){
+    $(id).onchange = function(){
+      cfgPatch(id, $(id).type === 'checkbox' ? $(id).checked : $(id).value);
+      const nk = storyKey(storyOpts());
+      if(story.pages.length && nk !== story.key){
+        const had = storyReadyCount();
+        story.key = nk; story.lang = storyOpts().lang;
+        if(had) sSetStatus('改咗講法：之前準備好嘅 ' + had + ' 頁要用新講法重新準備（改返原本設定就會用返舊嘅）。撳 🔁 用新講法講返呢頁。');
+      }
+      storyRefreshUI();
+    };
+  });
+  ['sView', 'sCover', 'sDir'].forEach(function(id){ $(id).onchange = function(){ cfgPatch(id, $(id).value); storyRenderSpread(); storyStrip(); }; });
+  $('sMode').onchange = function(){ cfgPatch('sMode', $('sMode').value); storyRefreshUI(); if(story.reading) storyPrefetchAhead(); };
+  $('sStartSel').onchange = function(){ story.sel = (parseInt($('sStartSel').value, 10) || 1) - 1; storyStrip(); };
+  $('sAuto').onchange = function(){ cfgPatch('sAuto', $('sAuto').checked); };
+  if(ttsSupported() && speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', storyRefreshUI);
+})();
+
+(function(){
+  const c = cfg();
+  const v0 = location.hash === '#quick' ? 'quick' : location.hash === '#story' ? 'story' : (c.view || (c.quick ? 'quick' : 'full'));
+  setView(/^(quick|story|full)$/.test(v0) ? v0 : 'full', false);
+})();
 if(!cfgReady()) setStatus('第一次用：先撳右上角「⚙ 設定」填中轉站嘅 Base URL。');
 })();
 </script>
