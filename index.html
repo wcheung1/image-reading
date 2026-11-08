@@ -114,14 +114,92 @@ table.cost tr.sel td:first-child::before{content:'✓ ';color:var(--acc)}
 table.cost tr.rec td:first-child::after{content:' ⭐';}
 .costwrap{overflow-x:auto;margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:4px 8px 8px}
 .costwrap h3{font-size:14px;margin:6px 0 0}
+/* ---------- 隨身口述模式 ---------- */
+#quickUI{display:none}
+body.quick #quickUI{display:block}
+body.quick .wrap > :not(header):not(#quickUI){display:none !important}
+.q-cam{position:relative;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:4/3;max-height:46vh;margin:0 auto 12px;width:100%}
+.q-cam video{width:100%;height:100%;object-fit:cover;display:block}
+.q-cammsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ddd;font-size:15px;text-align:center;padding:16px}
+.q-cammsg[hidden]{display:none}
+@media (max-width:480px){ header h1 small{display:none} header .btn{padding:8px 10px} }
+.q-rec{position:absolute;top:10px;left:10px;background:#c62828;color:#fff;border-radius:16px;padding:3px 10px;font-size:14px;font-weight:600}
+.q-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.qb{appearance:none;border:2px solid var(--acc);background:var(--card);color:var(--ink);border-radius:16px;min-height:96px;font:inherit;font-size:17px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px}
+.qb i{font-style:normal;font-size:30px;line-height:1}
+.qb:active{transform:scale(.97)}
+.qb:focus-visible{outline:4px solid var(--acc);outline-offset:3px}
+#qShot{background:var(--acc);color:#fff}
+.qb.rec{background:#c62828;border-color:#c62828;color:#fff}
+.qb:disabled{opacity:.5}
+.q-say{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px}
+.q-status{font-size:15px;color:var(--sub);min-height:1.5em}
+.q-text{font-size:19px;line-height:1.75;white-space:pre-wrap;min-height:3em;margin-top:6px;word-break:break-word}
+.q-text:empty{display:none}
+.q-ctl{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.q-ctl .btn{min-height:48px;font-size:15px;padding:6px}
+.q-set{margin-top:12px}
+.q-warn{margin-top:12px;text-align:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:420px){ .qb{min-height:88px;font-size:15px} .q-ctl{grid-template-columns:1fr 1fr} }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>👁 睇圖 <small>GLM Vision · 圖片／PDF 轉文字</small></h1>
+    <button class="btn" id="btnQuick" type="button">🦯 隨身口述</button>
     <button class="btn" id="btnCfg" aria-haspopup="dialog">⚙ 設定</button>
   </header>
+
+  <!-- ================= 隨身口述模式（俾睇唔到嘅人用：一撳影相／錄片，用廣東話讀出嚟） ================= -->
+  <section id="quickUI" aria-label="隨身口述模式">
+    <div class="q-cam">
+      <video id="qVideo" playsinline muted autoplay aria-hidden="true"></video>
+      <div id="qCamMsg" class="q-cammsg">鏡頭未開</div>
+      <div id="qRec" class="q-rec" hidden aria-hidden="true">● 錄緊 <span id="qRecT">0</span> 秒</div>
+    </div>
+    <div class="q-btns">
+      <button class="qb" id="qShot" type="button" aria-label="影相，然後用廣東話講返相入面有乜"><i aria-hidden="true">📷</i><span>影相講嘢</span></button>
+      <button class="qb" id="qRecBtn" type="button" aria-label="開始錄片，再撳一次就停，然後講返段片發生咩事"><i aria-hidden="true">🎥</i><span id="qRecLbl">錄片講嘢</span></button>
+      <button class="qb" id="qPick" type="button" aria-label="由相簿或者檔案揀相或者片"><i aria-hidden="true">🖼</i><span>揀相／片</span></button>
+    </div>
+    <input type="file" id="qCapPhoto" accept="image/*" capture="environment" hidden>
+    <input type="file" id="qCapVideo" accept="video/*" capture="environment" hidden>
+    <input type="file" id="qFile" accept="image/*,video/*,.heic,.heif,.mov,.mp4,.avi,.wmv,.3gp,.mkv,.webm" hidden>
+    <div class="q-say">
+      <div id="qStatus" class="q-status" role="status" aria-live="polite">撳「影相講嘢」或者「錄片講嘢」就得。</div>
+      <div id="qText" class="q-text" tabindex="0" aria-label="描述內容"></div>
+      <div id="qLive" class="sr" role="alert" aria-live="assertive"></div>
+      <div class="q-ctl">
+        <button class="btn" id="qPause" type="button">⏸ 暫停</button>
+        <button class="btn" id="qReplay" type="button">🔁 再讀</button>
+        <button class="btn" id="qStopTalk" type="button">⏹ 停</button>
+        <button class="btn" id="qCopy" type="button">📋 複製</button>
+      </div>
+    </div>
+    <details class="pv q-set">
+      <summary>⚙ 隨身模式設定</summary>
+      <div class="row">
+        <div><label class="lb" for="qLen">講法</label>
+          <select id="qLen"><option value="short">簡短：先講重點（建議）</option><option value="long">詳細：讀晒所有字、講晒細節</option></select></div>
+        <div><label class="lb" for="qSpeak">點樣讀出嚟</label>
+          <select id="qSpeak">
+            <option value="app">app 自己用廣東話讀（建議）</option>
+            <option value="sr">交俾讀屏軟件（VoiceOver／TalkBack）讀</option>
+            <option value="off">唔讀，淨係出字</option>
+          </select></div>
+      </div>
+      <div class="row">
+        <div><label class="lb" for="qVoice">廣東話聲</label><select id="qVoice"></select></div>
+        <div><label class="lb" for="qRate">語速 <span id="qRateV"></span></label><input type="range" id="qRate" min="0.6" max="1.6" step="0.1" style="width:100%"></div>
+      </div>
+      <div class="note" id="qVoiceNote"></div>
+      <div class="go"><button class="btn sm" type="button" id="qFlip">🔄 轉前／後鏡頭</button><button class="btn sm" type="button" id="qTestVoice">🔊 試吓把聲</button></div>
+      <div class="note">錄片最長 60 秒。錄嘅時候 app 直接由鏡頭攞畫面，唔會整影片檔；所有嘢淨係喺記憶體，熄咗就冇。</div>
+    </details>
+    <div class="note q-warn">⚠ 呢個係輔助工具，AI 會睇錯、會漏。唔好靠佢過馬路、避開危險或者睇藥物份量。</div>
+  </section>
 
   <div class="priv">🔒 啲圖同結果淨係擺喺呢個分頁嘅記憶體，<b>唔會</b>寫入 localStorage 或者任何儲存位。熄咗或者 reload 個分頁就冇晒。張圖只會送去你喺 ⚙ 填嘅 Base URL；呢頁唔會由任何外面網站載入程式碼。</div>
 
@@ -286,7 +364,8 @@ const CFG_KEY = 'glmvision_cfg_v2';
 const TPL_KEY = 'glmvision_tpl_v1';
 const DEF = {base:'', key:'', remember:true, model:'glm-5.3-flash', effort:'low', maxTok:16000,
              mode:'ocr', lang:'zh-Hant', res:'1600', slice:true,
-             vMethod:'auto', vMax:'auto', vRes:'auto', vSmart:true, priceIn:0.15, priceOut:0.50, tokCal:1, tokCalN:0};
+             vMethod:'auto', vMax:'auto', vRes:'auto', vSmart:true, priceIn:0.15, priceOut:0.50, tokCal:1, tokCalN:0,
+             quick:false, qLen:'short', qSpeak:'app', qVoice:'', qRate:1};
 let memKey = '';   /* 唔記住 key 嗰陣，key 淨係住喺呢度（記憶體） */
 function cfg(){
   let c;
@@ -1968,6 +2047,368 @@ $('zoom').onclick = function(){ $('zoom').close(); };
 renderTpls();
 refreshPromptUI();
 refreshResNote();
+/* ===================================================================
+   隨身口述模式：手機鏡頭一撳 → AI 用廣東話口語講 → 手機本身嘅廣東話聲讀出嚟
+   =================================================================== */
+
+/* ---------- 提示詞（廣東話口語、啱讀出嚟） ---------- */
+const Q_SPEAK_RULES = [
+'【點樣寫】',
+'・全部用香港廣東話口語，好似企喺佢身邊同佢傾偈咁講。用正寫：嘅、喺、咗、嚟、啲、冇、佢。',
+'・你寫嘅字會即刻用語音讀出嚟，所以唔准有任何符號：括號、星號、井號、項目符號、emoji、箭咀、破折號、標題，一律唔准。分段直接換行。',
+'・時間、價錢、電話用廣東話讀法寫，例如：十二點半、二十五蚊、九一二三 四五六七。',
+'・唔准講「呢張相」「如圖所示」「畫面中」呢類講法；直接講「你前面」「左手邊」。',
+'・見乜講乜，唔准估、唔准作。有真人就講外表、動作、表情，唔准估佢係邊個。',
+'・唔准開場白，唔准客套說話，唔准總結句。'
+].join('\n');
+function quickSys(kind, len){
+  const short = len !== 'long';
+  if(kind === 'frames') return [
+'你係一位幫視障人士睇嘢嘅口述員。用戶啱啱用手機錄咗一段片，佢完全睇唔到。你收到嘅係由段片按時間抽出嚟嘅畫面，每格前面有時間；你睇唔到格與格之間嘅動作，亦都聽唔到聲。',
+'',
+'【講乜、講咩次序】',
+'・第一句講成段片大概係乜：喺邊、有乜人或者嘢、發生緊乜。',
+'・跟住按時間講發生咗乜事，用「一開始」「跟住」「大約第十秒」「最後」呢類講法，唔好讀時間標記符號。冇變化嘅部分一句帶過。',
+'・見到有字（招牌、字幕、螢幕、標籤），照讀出嚟。',
+'・如果見到可能有危險嘅嘢（車、梯級、障礙物、人衝埋嚟），一定要早啲講。',
+'・聽唔到聲：有人講嘢就講「有人講緊嘢」，唔准估佢講乜。',
+short ? '・長度：大約四至八句，揀最重要嘅講。' : '・長度：可以詳細啲，逐段講清楚，但都係先講重點。',
+'',
+Q_SPEAK_RULES
+  ].join('\n');
+  return [
+'你係一位幫視障人士睇嘢嘅口述員。用戶啱啱用手機影咗相，佢完全睇唔到，你寫嘅嘢會即刻讀俾佢聽。',
+'',
+'【講乜、講咩次序】',
+'・第一句講最重要嘅嘢：呢度係乜地方或者乜嘢，正前面有乜。',
+'・如果見到可能有危險嘅嘢（梯級、車、障礙物、熱嘢、利器、地濕），喺第一或者第二句講。',
+'・再講重要細節：有幾多個人、做緊乜、表情；物件係乜、乜嘢顏色；用「正前面」「左手邊」「右手邊」「上面」「下面」「近」「遠」講位置。',
+short ? '・見到有字（招牌、標籤、包裝、螢幕、信件、餐牌），讀標題同最重要嗰幾句；字多就講明「仲有好多字，要詳細可以轉做詳細講法」。'
+      : '・見到有字（招牌、標籤、包裝、螢幕、信件、餐牌），由上至下全部照讀出嚟。',
+'・如果張相太暗、太矇、影唔到重點，就直接講，再教佢點樣影過，例如「部手機向左移少少」「拎遠少少」「開燈」。',
+short ? '・長度：大約三至六句。' : '・長度：可以詳細，但都係先講重點，再講細節。',
+'',
+Q_SPEAK_RULES
+  ].join('\n');
+}
+
+/* ---------- 廣東話語音（用手機本身嘅聲；iPhone、Android 一般喺部機度合成） ---------- */
+const tts = {sents:[], idx:0, fed:0, buf:'', paused:false, speaking:false, token:0, unlocked:false};
+function ttsSupported(){ return 'speechSynthesis' in window && typeof SpeechSynthesisUtterance === 'function'; }
+function yueVoices(){
+  if(!ttsSupported()) return [];
+  return speechSynthesis.getVoices().filter(function(v){ return /^(yue|zh[-_]HK)/i.test(v.lang) || /cantonese|粵|粤|廣東|广东/i.test(v.name); });
+}
+function ttsVoice(){
+  const vs = yueVoices(); if(!vs.length) return null;
+  const want = cfg().qVoice;
+  return vs.find(function(v){ return v.name === want; }) || vs.find(function(v){ return v.localService; }) || vs[0];
+}
+function ttsUnlock(){
+  /* iPhone 要第一次喺「撳掣」入面講過嘢，之後先俾自動讀 */
+  if(tts.unlocked || !ttsSupported()) return;
+  tts.unlocked = true;
+  try{ const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); }catch(e){}
+}
+function ttsClean(t){
+  return String(t).replace(/[【】\[\]#*＊•・●▶►→←↑↓「」『』（）()<>《》_~`|｜]/g, ' ').replace(/[ \t]+/g, ' ').trim();
+}
+function ttsSay(text, onend){
+  const u = new SpeechSynthesisUtterance(text);
+  const v = ttsVoice(); if(v) u.voice = v;
+  u.lang = v ? v.lang : 'zh-HK';
+  u.rate = +cfg().qRate || 1;
+  u.onend = u.onerror = function(){ if(onend) onend(); };
+  tts.cur = u;                      /* 留住個 reference，Chrome 先唔會中途食咗 onend */
+  speechSynthesis.speak(u);
+}
+function ttsPump(){
+  if(cfg().qSpeak !== 'app' || !ttsSupported()) return;
+  if(tts.speaking || tts.paused || tts.idx >= tts.sents.length) return;
+  const my = ++tts.token;
+  tts.speaking = true;
+  ttsSay(tts.sents[tts.idx], function(){
+    if(my !== tts.token) return;    /* 暫停／停咗，唔好當讀完 */
+    tts.speaking = false; tts.idx++; ttsPump();
+  });
+}
+function ttsReset(keepCue){
+  tts.token++; tts.sents = []; tts.idx = 0; tts.fed = 0; tts.buf = ''; tts.paused = false; tts.speaking = false;
+  if(!keepCue && ttsSupported()) speechSynthesis.cancel();   /* keepCue：唔好截斷啱啱講緊嘅「影咗，睇緊」 */
+}
+/* 一路出字一路讀：每夠一句就讀，唔使等成篇寫完 */
+function ttsFeed(full, final){
+  tts.buf += full.slice(tts.fed); tts.fed = full.length;
+  const re = /[^。！？!?\n]*[。！？!?\n]+/g;
+  let m, used = 0;
+  while((m = re.exec(tts.buf))){ const s = ttsClean(m[0]); if(s) tts.sents.push(s); used = re.lastIndex; }
+  tts.buf = tts.buf.slice(used);
+  if(final && tts.buf.trim()){ tts.sents.push(ttsClean(tts.buf)); tts.buf = ''; }
+  ttsPump();
+}
+function ttsCue(text){
+  /* 狀態提示（「影咗，睇緊」）：唔入讀稿隊 */
+  const mode = cfg().qSpeak;
+  if(mode === 'sr'){ $('qLive').textContent = ''; setTimeout(function(){ $('qLive').textContent = text; }, 50); return; }
+  if(mode !== 'app' || !ttsSupported()) return;
+  if(tts.speaking) return;
+  speechSynthesis.cancel(); ttsSay(text);
+}
+function beep(freq, ms){
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+    beep.ctx = beep.ctx || new AC();
+    const ctx = beep.ctx, o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = freq || 880; g.gain.value = 0.08;
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime + (ms || 120) / 1000);
+  }catch(e){}
+  try{ if(navigator.vibrate) navigator.vibrate(ms || 120); }catch(e){}
+}
+function refreshVoiceUI(){
+  const sel = $('qVoice'), note = $('qVoiceNote');
+  if(!ttsSupported()){ sel.innerHTML = '<option>（呢個 browser 冇語音功能）</option>'; note.textContent = '呢個 browser 讀唔到字，請將「點樣讀出嚟」改做「交俾讀屏軟件」。'; return; }
+  const vs = yueVoices(), cur = ttsVoice();
+  sel.innerHTML = '';
+  if(!vs.length){
+    sel.innerHTML = '<option value="">（部機搵唔到廣東話聲）</option>';
+    note.innerHTML = '部機未有廣東話聲。<b>iPhone</b>：設定 → 輔助使用 → 語音內容 → 聲音 → 中文 → 中文（香港），下載一把聲。<b>Android</b>：設定 → 文字轉語音輸出 → Google 語音服務 → 安裝語音資料 → 粵語（香港）。裝完重新開呢頁。';
+    return;
+  }
+  vs.forEach(function(v){
+    const o = document.createElement('option'); o.value = v.name;
+    o.textContent = v.name + (v.localService ? '（喺部機合成）' : '（要上網合成）');
+    if(cur && v.name === cur.name) o.selected = true;
+    sel.appendChild(o);
+  });
+  note.textContent = cur && !cur.localService
+    ? '⚠ 呢把聲要上網合成：讀嘅文字會送去 browser 公司（例如 Google）嘅伺服器。想完全唔經第三方，揀一把寫住「喺部機合成」嘅聲。'
+    : '✅ 呢把聲喺部機度合成，讀嘅文字唔會送去任何地方。';
+}
+
+/* ---------- 鏡頭 ---------- */
+let qStream = null, qFacing = 'environment', qWake = null;
+async function qCamStart(){
+  const v = $('qVideo'), msg = $('qCamMsg');
+  if(qStream) return true;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    msg.textContent = '呢度開唔到即時鏡頭（要用 https 網址開）。撳下面個掣會用手機相機影。'; return false;
+  }
+  msg.textContent = '開緊鏡頭…'; msg.hidden = false;
+  try{
+    qStream = await navigator.mediaDevices.getUserMedia({audio:false, video:{facingMode:{ideal:qFacing}, width:{ideal:1920}, height:{ideal:1080}}});
+    v.srcObject = qStream; await v.play().catch(function(){});
+    msg.hidden = true;
+    try{ if(navigator.wakeLock) qWake = await navigator.wakeLock.request('screen'); }catch(e){}
+    return true;
+  }catch(e){
+    qStream = null;
+    msg.textContent = (e && e.name === 'NotAllowedError') ? '你冇俾用鏡頭。可以喺 browser 設定准呢個網站用相機；或者撳下面個掣用手機相機影。'
+                                                         : '開唔到鏡頭（' + ((e && e.message) || e) + '）。撳下面個掣會用手機相機影。';
+    return false;
+  }
+}
+function qCamStop(){
+  if(qStream){ qStream.getTracks().forEach(function(t){ t.stop(); }); qStream = null; }
+  $('qVideo').srcObject = null; $('qCamMsg').hidden = false; $('qCamMsg').textContent = '鏡頭已經熄咗';
+  if(qWake){ try{ qWake.release(); }catch(e){} qWake = null; }
+}
+function qLive(){ const v = $('qVideo'); return !!(qStream && v.videoWidth); }
+
+/* ---------- 開／關隨身模式 ---------- */
+function setQuick(on, save){
+  document.body.classList.toggle('quick', on);
+  $('btnQuick').textContent = on ? '🗂 完整版' : '🦯 隨身口述';
+  if(save) cfgPatch('quick', on);
+  if(on){ refreshVoiceUI(); qCamStart(); }
+  else{ qCamStop(); if(qRecState) qRecStop(true); ttsReset(); }
+}
+$('btnQuick').onclick = function(){ ttsUnlock(); setQuick(!document.body.classList.contains('quick'), true); };
+document.addEventListener('visibilitychange', function(){
+  if(!document.body.classList.contains('quick')) return;
+  if(document.hidden){ if(!qRecState) qCamStop(); } else qCamStart();
+});
+
+/* ---------- 送去 AI，一路出字一路讀 ---------- */
+let qBusy = false, qCtrl = null;
+function qSetStatus(t){ $('qStatus').textContent = t; }
+function qButtons(dis){ ['qShot', 'qPick'].forEach(function(id){ $(id).disabled = dis; }); }
+async function qDescribe(job){
+  if(!cfgReady()){ const m = '未設定好 AI。請叫人幫手喺完整版撳「設定」填中轉站網址。'; qSetStatus(m); ttsCue(m); return; }
+  qBusy = true; qButtons(true); qCtrl = new AbortController();
+  ttsReset(true); $('qText').textContent = ''; $('qPause').textContent = '⏸ 暫停';
+  const len = cfg().qLen || 'short';
+  const t0 = Date.now();
+  let gotText = false;
+  const waitTimer = setInterval(function(){
+    const s = Math.round((Date.now() - t0) / 1000);
+    if(!gotText) qSetStatus('⏳ 睇緊…（' + s + ' 秒）');
+    if(!gotText && s > 0 && s % 12 === 0) ttsCue('仲睇緊，等等');
+  }, 1000);
+  /* 同時放入完整版嘅結果，方便之後複製或者匯出 */
+  const r = makeCard((job.kind === 'frames' ? '🎥 ' : '📷 ') + job.title);
+  r.kind = job.kind;
+  if(job.kind === 'frames'){ r.frames = job.frames; r.dur = job.dur; setThumb(r, job.frames[0].url); renderStrip(r); }
+  else{ r.img = job.img; setThumb(r, job.img); }
+  try{
+    let content;
+    if(job.kind === 'frames'){
+      content = [{type:'text', text:'用戶錄咗一段大約 ' + Math.max(1, Math.round(job.dur)) + ' 秒嘅片，以下係按時間抽出嚟嘅 ' + job.frames.length + ' 格畫面。請講俾佢聽發生咗乜事。'}];
+      job.frames.forEach(function(f){ content.push({type:'text', text:'[' + fmtT(f.t) + ']'}); content.push({type:'image_url', image_url:{url:f.url}}); });
+    }else{
+      content = [{type:'text', text:'用戶啱啱' + (job.fromFile ? '揀咗' : '影咗') + '呢張相，請講俾佢聽。'}, {type:'image_url', image_url:{url:job.img}}];
+    }
+    const res = await callVision([{role:'system', content:quickSys(job.kind, len)}, {role:'user', content:content}],
+      {temp:0.3, signal:qCtrl.signal,
+       onNote:function(m){ qSetStatus('⏳ ' + m); },
+       onDelta:function(d){
+         if(d.text){
+           if(!gotText){ gotText = true; beep(1046, 80); }
+           qSetStatus('🔊 講緊…');
+           $('qText').textContent = d.text; r.ta.value = d.text;
+           ttsFeed(d.text, false);
+         }
+       }});
+    const text = String(res.text || '').trim();
+    if(!text) throw new Error('AI 冇回答，請再試一次。');
+    $('qText').textContent = text; r.ta.value = text; autoGrow(r.ta);
+    ttsFeed(text, true);
+    const u = res.usage;
+    const meta = Math.round((Date.now() - t0) / 1000) + ' 秒' + (u ? ' · ' + fmtUSD(costOf(u.prompt_tokens || 0, u.completion_tokens || 0)) : '');
+    r.st.textContent = '✅ 隨身口述 · ' + meta;
+    qSetStatus('✅ 講完（' + meta + '）。再撳「影相講嘢」可以睇過第二樣。');
+    if(cfg().qSpeak === 'sr'){ $('qLive').textContent = ''; setTimeout(function(){ $('qLive').textContent = text; }, 80); }
+  }catch(err){
+    const m = err.stopped ? '停咗。' : ('出錯：' + String(err.message || err).split('\n')[0]);
+    qSetStatus('❌ ' + m); failCard(r, m);
+    if(!err.stopped){ beep(330, 250); ttsCue(m); }
+  }finally{
+    clearInterval(waitTimer); qBusy = false; qCtrl = null; qButtons(false);
+  }
+}
+
+/* ---------- 影相 ---------- */
+function qPx(){ return cfg().qLen === 'long' ? 1600 : 1280; }
+$('qShot').onclick = async function(){
+  ttsUnlock();
+  if(qBusy){ ttsCue('仲睇緊上一張'); return; }
+  if(!qLive() && !(await qCamStart() && qLive())){ $('qCapPhoto').click(); return; }
+  const v = $('qVideo');
+  const pic = toJpeg(v, 0, 0, v.videoWidth, v.videoHeight, qPx());
+  ttsReset(); beep(880, 120); ttsCue('影咗，睇緊');
+  qDescribe({kind:'image', img:pic.url, title:'影相 ' + new Date().toLocaleTimeString('zh-HK', {hour:'2-digit', minute:'2-digit'})});
+};
+
+/* ---------- 錄片：錄嘅時候直接由鏡頭每半秒攞一格，唔整影片檔 ---------- */
+let qRecState = null;
+const Q_REC_MAX = 60;
+function qRecStart(){
+  const v = $('qVideo');
+  qRecState = {t0:performance.now(), cands:[], w:v.videoWidth, h:v.videoHeight};
+  const grab = function(){
+    if(!qRecState) return;
+    const t = (performance.now() - qRecState.t0) / 1000;
+    try{
+      const pic = toJpeg(v, 0, 0, v.videoWidth, v.videoHeight, 1024);
+      pic.t = t; pic.sig = frameSig(v, v.videoWidth, v.videoHeight);
+      qRecState.cands.push(pic);
+    }catch(e){}
+    $('qRecT').textContent = Math.floor(t);
+    if(t >= Q_REC_MAX){ qRecStop(false); ttsCue('夠六十秒，自動停咗'); }
+  };
+  grab();
+  qRecState.timer = setInterval(grab, 500);
+  $('qRec').hidden = false; $('qRecBtn').classList.add('rec'); $('qRecLbl').textContent = '停，然後講';
+  $('qRecBtn').setAttribute('aria-label', '錄緊，撳一下停，然後講返段片發生咩事');
+  ttsReset(); beep(660, 150); ttsCue('開始錄，再撳一下就停');
+}
+function qRecStop(cancel){
+  const st = qRecState; if(!st) return;
+  clearInterval(st.timer); qRecState = null;
+  $('qRec').hidden = true; $('qRecBtn').classList.remove('rec'); $('qRecLbl').textContent = '錄片講嘢';
+  $('qRecBtn').setAttribute('aria-label', '開始錄片，再撳一次就停，然後講返段片發生咩事');
+  if(cancel || !st.cands.length) return;
+  const dur = (performance.now() - st.t0) / 1000;
+  const rc = recFor({dur:dur, w:st.w, h:st.h}, 'layout');
+  const frames = pickFrames(st.cands, rc.maxN, true, dur);
+  ttsReset(); beep(880, 120); ttsCue('停咗，睇緊');
+  qDescribe({kind:'frames', frames:frames, dur:dur, title:'錄片 ' + Math.round(dur) + ' 秒'});
+}
+$('qRecBtn').onclick = async function(){
+  ttsUnlock();
+  if(qRecState){ qRecStop(false); return; }
+  if(qBusy){ ttsCue('仲睇緊上一樣'); return; }
+  if(!qLive() && !(await qCamStart() && qLive())){ $('qCapVideo').click(); return; }
+  qRecStart();
+};
+
+/* ---------- 揀相／片（相簿、WhatsApp 存咗嘅片、或者手機相機 app） ---------- */
+async function qFromFile(file){
+  if(!file) return;
+  if(qBusy){ ttsCue('仲睇緊上一樣'); return; }
+  const kind = await sniff(file);
+  const note = function(m){ qSetStatus(m); };
+  try{
+    if(kind === 'video'){
+      ttsReset(); ttsCue('收到段片，抽緊畫面');
+      const ex = await extractFrames(file, {maxN:24, px:1024, smart:true,
+        plan:function(dur, w, h){ const rc = recFor({dur:dur, w:w, h:h}, 'layout'); return {maxN:rc.maxN, px:1024}; }}, note, new AbortController().signal);
+      if(!ex.frames.length) throw new Error('抽唔到畫面');
+      qDescribe({kind:'frames', frames:ex.frames, dur:ex.dur, title:file.name || '影片'});
+    }else if(kind === 'image' || kind === 'heic' || kind === 'tiff'){
+      ttsReset(); ttsCue('收到，睇緊');
+      const dec = await decodeAny({kind:kind, file:file, name:file.name || ''});
+      let pic; try{ pic = toJpeg(dec.src, 0, 0, dec.w, dec.h, qPx()); }finally{ freeDecoded(dec); }
+      qDescribe({kind:'image', img:pic.url, title:file.name || '相', fromFile:true});
+    }else{
+      throw new Error('呢個檔唔係相或者片');
+    }
+  }catch(e){ const m = '出錯：' + String(e.message || e).split('\n')[0]; qSetStatus('❌ ' + m); ttsCue(m); }
+}
+$('qPick').onclick = function(){ ttsUnlock(); $('qFile').click(); };
+['qFile', 'qCapPhoto', 'qCapVideo'].forEach(function(id){
+  $(id).onchange = function(){ const f = this.files && this.files[0]; this.value = ''; qFromFile(f); };
+});
+
+/* ---------- 讀稿控制 ---------- */
+$('qPause').onclick = function(){
+  ttsUnlock();
+  if(!ttsSupported() || cfg().qSpeak !== 'app') return;
+  if(tts.paused){ tts.paused = false; $('qPause').textContent = '⏸ 暫停'; ttsPump(); }
+  else{ tts.paused = true; tts.token++; tts.speaking = false; speechSynthesis.cancel(); $('qPause').textContent = '▶ 繼續'; }
+};
+$('qReplay').onclick = function(){
+  ttsUnlock();
+  const t = $('qText').textContent.trim(); if(!t) return;
+  if(cfg().qSpeak === 'sr'){ $('qText').focus(); return; }
+  ttsReset(); $('qPause').textContent = '⏸ 暫停'; ttsFeed(t, true);
+};
+$('qStopTalk').onclick = function(){
+  if(qCtrl) qCtrl.abort();
+  if(qRecState) qRecStop(true);
+  tts.token++; tts.idx = tts.sents.length; tts.speaking = false; tts.paused = false;
+  if(ttsSupported()) speechSynthesis.cancel();
+  $('qPause').textContent = '⏸ 暫停';
+};
+$('qCopy').onclick = async function(){ const t = $('qText').textContent.trim(); if(!t){ toast('未有內容'); return; } toast(await copyText(t) ? '已複製' : '複製唔到'); };
+$('qFlip').onclick = function(){ qFacing = qFacing === 'environment' ? 'user' : 'environment'; qCamStop(); qCamStart(); };
+$('qTestVoice').onclick = function(){ ttsUnlock(); if(!ttsSupported()) return; speechSynthesis.cancel(); ttsSay('你好，我會用呢把聲講返你影到嘅嘢俾你聽。'); };
+
+/* ---------- 設定（屬設定，記住） ---------- */
+(function(){
+  const c = cfg();
+  $('qLen').value = c.qLen === 'long' ? 'long' : 'short';
+  $('qSpeak').value = /^(app|sr|off)$/.test(c.qSpeak) ? c.qSpeak : 'app';
+  $('qRate').value = c.qRate || 1; $('qRateV').textContent = '×' + (+$('qRate').value).toFixed(1);
+  $('qLen').onchange = function(){ cfgPatch('qLen', $('qLen').value); };
+  $('qSpeak').onchange = function(){ cfgPatch('qSpeak', $('qSpeak').value); if($('qSpeak').value !== 'app'){ tts.token++; if(ttsSupported()) speechSynthesis.cancel(); } };
+  $('qVoice').onchange = function(){ cfgPatch('qVoice', $('qVoice').value); refreshVoiceUI(); };
+  $('qRate').oninput = function(){ $('qRateV').textContent = '×' + (+$('qRate').value).toFixed(1); cfgPatch('qRate', +$('qRate').value); };
+  if(ttsSupported()) speechSynthesis.onvoiceschanged = refreshVoiceUI;
+  refreshVoiceUI();
+  /* 網址加 #quick，或者上次停喺隨身模式 → 一開就入隨身模式（方便加去主畫面當 app 用） */
+  if(location.hash === '#quick' || c.quick) setQuick(true, false);
+})();
+
 if(!cfgReady()) setStatus('第一次用：先撳右上角「⚙ 設定」填中轉站嘅 Base URL。');
 })();
 </script>
