@@ -178,6 +178,14 @@ body.story .wrap > :not(header):not(#storyUI){display:none !important}
 .s-batch{margin-top:10px}
 .s-batch-row{display:flex;gap:8px;align-items:center;margin-top:6px}
 .s-info{display:flex;gap:8px;align-items:center;margin-top:8px}
+.s-tune{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.s-tune-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.s-tune-lb{font-size:13px;color:var(--sub);width:34px;flex:none}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.seg button{appearance:none;border:0;border-right:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:14px;padding:7px 11px;min-height:40px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--acc);color:#fff;font-weight:600}
+.seg .rv{display:flex;align-items:center;padding:0 12px;font-weight:600;font-size:15px;border-right:1px solid var(--line);min-width:58px;justify-content:center}
 .s-cap{margin-top:10px}
 .s-h3{font-size:15px;margin:14px 0 4px}
 .s-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scroll-snap-type:x proximity}
@@ -254,7 +262,7 @@ body.story .wrap > :not(header):not(#storyUI){display:none !important}
       </div>
       <div class="row">
         <div><label class="lb" for="qVoice">廣東話聲</label><select id="qVoice"></select></div>
-        <div><label class="lb" for="qRate">語速 <span id="qRateV"></span></label><input type="range" id="qRate" min="0.6" max="1.6" step="0.1" style="width:100%"></div>
+        <div><label class="lb" for="qRate">語速 <span id="qRateV"></span></label><input type="range" id="qRate" min="0.5" max="2" step="0.1" style="width:100%"></div>
       </div>
       <div class="note" id="qVoiceNote"></div>
       <div class="go"><button class="btn sm" type="button" id="qFlip">🔄 轉前／後鏡頭</button><button class="btn sm" type="button" id="qTestVoice">🔊 試吓把聲</button></div>
@@ -290,7 +298,8 @@ body.story .wrap > :not(header):not(#storyUI){display:none !important}
         <div class="row">
           <div><label class="lb" for="sAge">講俾邊個聽</label>
             <select id="sAge">
-              <option value="k">幼稚園（3–6 歲）</option>
+              <option value="k1">幼稚園低班（3–4 歲）</option>
+              <option value="k3">幼稚園高班（5–6 歲）</option>
               <option value="p1">初小（6–9 歲）</option>
               <option value="p4">高小（9–12 歲）</option>
               <option value="adult">大人</option>
@@ -300,6 +309,12 @@ body.story .wrap > :not(header):not(#storyUI){display:none !important}
               <option value="tell">講故事：用口語生動咁講，再講幅圖</option>
               <option value="read">照讀：逐字讀書上嘅字，再講幅圖</option>
               <option value="teach">講解：教科書用，解釋內容（練習唔講答案）</option>
+            </select></div>
+          <div><label class="lb" for="sDesc">描述幾多</label>
+            <select id="sDesc">
+              <option value="less">少描述・重劇情</option>
+              <option value="mid">平衡（預設）</option>
+              <option value="more">多描述：衫褲顏色、表情、環境都講</option>
             </select></div>
           <div><label class="lb" for="sLang">用咩語言講</label>
             <select id="sLang">
@@ -374,6 +389,20 @@ body.story .wrap > :not(header):not(#storyUI){display:none !important}
       <div class="s-spread" id="sSpread" aria-label="書頁"></div>
       <div class="s-bar2"><span id="sPageLbl" class="note" style="margin:0"></span>
         <button class="btn sm" id="sViewToggle" type="button">📖 單頁／雙頁</button></div>
+      <div class="s-tune" aria-label="即場調整">
+        <div class="s-tune-row"><span class="s-tune-lb">程度</span>
+          <div class="seg" role="group" aria-label="講嘅程度" id="sTuneAge">
+            <button type="button" data-v="k1">幼低</button><button type="button" data-v="k3">幼高</button><button type="button" data-v="p1">初小</button><button type="button" data-v="p4">高小</button><button type="button" data-v="adult">大人</button>
+          </div></div>
+        <div class="s-tune-row"><span class="s-tune-lb">描述</span>
+          <div class="seg" role="group" aria-label="描述幾多" id="sTuneDesc">
+            <button type="button" data-v="less">少・重劇情</button><button type="button" data-v="mid">平衡</button><button type="button" data-v="more">多描述</button>
+          </div></div>
+        <div class="s-tune-row"><span class="s-tune-lb">語速</span>
+          <div class="seg spd">
+            <button type="button" id="sSlower" aria-label="讀慢啲">🐢 慢啲</button><span id="sRateV" class="rv" aria-live="polite"></span><button type="button" id="sFaster" aria-label="讀快啲">快啲 🐇</button>
+          </div></div>
+      </div>
       <div class="q-status" id="sStatus" role="status" aria-live="polite"></div>
       <div class="q-text" id="sText" tabindex="0" aria-label="呢頁講嘅內容"></div>
       <div id="sLive" class="sr" role="alert" aria-live="assertive"></div>
@@ -566,7 +595,7 @@ const DEF = {base:'', key:'', remember:true, model:'glm-5.3-flash', effort:'low'
              mode:'ocr', lang:'zh-Hant', res:'1600', slice:true,
              vMethod:'auto', vMax:'auto', vRes:'auto', vSmart:true, priceIn:0.15, priceOut:0.50, tokCal:1, tokCalN:0,
              quick:false, qLen:'short', qSpeak:'app', qVoice:'', qRate:1,
-             view:'full', sAge:'p1', sStyle:'tell', sLang:'yue', sAuto:true, sAskKid:false,
+             view:'full', sAge:'p1', sStyle:'tell', sLang:'yue', sAuto:true, sAskKid:false, sDesc:'mid',
              sMode:'ahead1', sView:'auto', sCover:'alone', sDir:'ltr', qAskKeep:false};
 let memKey = '';   /* 唔記住 key 嗰陣，key 淨係住喺呢度（記憶體） */
 function cfg(){
@@ -2651,7 +2680,7 @@ $('qTestVoice').onclick = function(){ ttsUnlock(); if(!ttsSupported()) return; s
   $('qLen').onchange = function(){ cfgPatch('qLen', $('qLen').value); };
   $('qSpeak').onchange = function(){ cfgPatch('qSpeak', $('qSpeak').value); if($('qSpeak').value !== 'app'){ tts.token++; if(ttsSupported()) speechSynthesis.cancel(); } };
   $('qVoice').onchange = function(){ cfgPatch('qVoice', $('qVoice').value); refreshVoiceUI(); };
-  $('qRate').oninput = function(){ $('qRateV').textContent = '×' + (+$('qRate').value).toFixed(1); cfgPatch('qRate', +$('qRate').value); };
+  $('qRate').oninput = function(){ $('qRateV').textContent = '×' + (+$('qRate').value).toFixed(1); cfgPatch('qRate', +$('qRate').value); if(typeof storyTuneUI === 'function') storyTuneUI(); };
   if(ttsSupported()) speechSynthesis.onvoiceschanged = refreshVoiceUI;
   refreshVoiceUI();
   /* 網址加 #quick，或者上次停喺隨身模式 → 一開就入隨身模式（方便加去主畫面當 app 用） */
@@ -2832,18 +2861,26 @@ $('fuQ').addEventListener('keydown', function(e){ if(e.key === 'Enter' && !e.shi
    講故事／睇書
    兩種準備方式：① 邊讀邊準備（下一頁／下兩頁）② 一次過準備全本（可以暫停、匯出、下次續做）
    =================================================================== */
-const STORY_AGE = {k:'三至六歲嘅幼稚園小朋友', p1:'六至九歲嘅初小學生', p4:'九至十二歲嘅高小學生', adult:'大人'};
+const STORY_AGE = {k1:'三至四歲嘅幼稚園低班小朋友', k3:'五至六歲嘅幼稚園高班小朋友', p1:'六至九歲嘅初小學生', p4:'九至十二歲嘅高小學生', adult:'大人'};
+const STORY_AGE_SHORT = {k1:'幼稚園低班', k3:'幼稚園高班', p1:'初小', p4:'高小', adult:'大人'};
+const STORY_DESC_SHORT = {less:'少描述・重劇情', mid:'平衡', more:'多描述'};
+function storyAgeFix(v){ return v === 'k' ? 'k3' : (STORY_AGE[v] ? v : 'p1'); }
 const story = {name:'', author:'', source:'', autoName:false, pages:[], idx:-1, sel:-1, cache:{}, genCtrl:null, hold:true, reading:false, lang:'yue', key:'',
                batchOn:false, batchPaused:false, pending:null, spent:0, retake:null, nums:null, startWant:0, capCover:false, dirHint:false, wake:null};
-function storyOpts(){ return {age:$('sAge').value, style:$('sStyle').value, lang:$('sLang').value, ask:$('sAskKid').checked}; }
-function storyKey(o){ return [o.age, o.style, o.lang, o.ask].join('|'); }
+function storyOpts(){ return {age:$('sAge').value, style:$('sStyle').value, lang:$('sLang').value, ask:$('sAskKid').checked, desc:$('sDesc').value || 'mid'}; }
+function storyKey(o){ return [o.age, o.style, o.lang, o.ask, o.desc].join('|'); }
 function storyLangRule(lang){
   if(lang === 'en') return '・Output language: natural spoken English only, ready to be read aloud. No symbols, no headings, no lists.';
   if(lang === 'cmn') return '・全部用普通话口语，简体字。';
   return '・全部用香港廣東話口語講，好似坐喺小朋友隔籬講故事咁。用正寫：嘅、喺、咗、嚟、啲、冇、佢。';
 }
 function storySys(o){
-  const len = {k:'每頁大約二至五句，用好簡單嘅字。', p1:'每頁大約三至七句。', p4:'可以詳細啲，但都要清楚易明。', adult:'正常長度。'}[o.age];
+  const len = {k1:'每版大約二至四句，句子要短，用最簡單、最日常嘅字，一句只講一件事。',
+               k3:'每版大約三至五句，用簡單嘅字，句子唔好太長。',
+               p1:'每版大約三至七句。', p4:'可以詳細啲，但都要清楚易明。', adult:'正常長度。'}[o.age];
+  const desc = {less:'描述要少：唔好形容衫褲顏色、髮型、背景擺設呢類細節；圖畫最多用一句帶過劇情需要嘅嘢（邊個喺度、做緊乜）。重點放喺劇情推進：發生咩事、點解、之後點。',
+                mid:'劇情同描述要平衡：先講清楚發生咩事，再揀一兩樣對劇情有用嘅畫面細節講。',
+                more:'描述要多：劇情講齊之後，用生動嘅字形容人物外表、表情、顏色、環境同氣氛，等聽嘅人好似親眼睇到幅圖；但唔可以作出圖入面冇嘅嘢。'}[o.desc || 'mid'];
   const style = {
     tell:'用口語講出呢頁嘅內容：意思要忠於原文，唔好自己加情節；可以講得生動啲，有對白就講明邊個講、用乜語氣講。之後用一兩句講幅圖畫咗乜（人物、表情、顏色、動作），等睇唔到圖嘅小朋友都知道。',
     read:o.lang === 'en' ? 'Read the printed words on this page exactly as written. Then add one or two sentences describing the picture.'
@@ -2864,6 +2901,7 @@ function storySys(o){
 '【點講】',
 '・張相有兩版嘅話，按翻書方向先講第一版再講第二版，自然接住講，唔使講左邊右邊。',
 '・' + style,
+'・' + desc,
 '・' + len,
 '・封面：講書名同作者，再一句講封面畫咗乜。',
 '・前後要連貫：會話你知上一頁講到邊，接住講，唔好重複，唔好每頁重新介紹。',
@@ -3097,7 +3135,24 @@ async function storyAddFile(file, asCover){
 }
 
 function sSetStatus(t){ $('sStatus').textContent = t; }
-function storyReady(i){ const c = story.cache[i]; return !!(c && c.state === 'done' && c.key === story.key); }
+function storyReady(i){
+  const c = story.cache[i];
+  if(!c) return false;
+  if(c.state === 'done' && c.key === story.key) return true;
+  if(c.alt && c.alt[story.key]){ storyRestore(c); return true; }   /* 呢個講法之前講過，攞返出嚟 */
+  return false;
+}
+function storyArchive(c){
+  if(!c || c.state !== 'done' || !c.key) return;
+  c.alt = c.alt || {};
+  c.alt[c.key] = {text:c.text, skip:c.skip, usage:c.usage};
+}
+function storyRestore(c){
+  const v = c.alt[story.key]; if(!v) return;
+  storyArchive(c);
+  c.genTok = (c.genTok || 0) + 1; c.promise = null;   /* 準備緊另一個講法嘅就唔要佢嘅結果 */
+  c.text = v.text; c.skip = v.skip; c.usage = v.usage; c.key = story.key; c.state = 'done';
+}
 function storyCtrl(){ if(!story.genCtrl || story.genCtrl.signal.aborted) story.genCtrl = new AbortController(); return story.genCtrl; }
 function storyReadyCount(){ let n = 0; for(let i = 0; i < story.pages.length; i++) if(storyReady(i)) n++; return n; }
 function storyResetBook(){
@@ -3175,11 +3230,13 @@ async function storyImport(file, others){
   if(!data || data.app !== 'glm-vision-book' || !Array.isArray(data.pages)){ $('sBookInfo').textContent = '❌ 呢個唔係由呢個 app 匯出嘅書'; return; }
   /* 用返嗰陣嘅講法設定，咁逐字稿先對得上 */
   const st = data.settings || {};
-  if(STORY_AGE[st.age]) $('sAge').value = st.age;
+  if(st.age) $('sAge').value = storyAgeFix(st.age);
+  $('sDesc').value = /^(less|mid|more)$/.test(st.desc) ? st.desc : 'mid';
   if(/^(tell|read|teach)$/.test(st.style)) $('sStyle').value = st.style;
   if(/^(yue|en|cmn)$/.test(st.lang)) $('sLang').value = st.lang;
   $('sAskKid').checked = !!st.ask;
-  ['sAge', 'sStyle', 'sLang'].forEach(function(id){ cfgPatch(id, $(id).value); }); cfgPatch('sAskKid', $('sAskKid').checked);
+  ['sAge', 'sStyle', 'sLang', 'sDesc'].forEach(function(id){ cfgPatch(id, $(id).value); }); cfgPatch('sAskKid', $('sAskKid').checked);
+  storyTuneUI();
   const hasImgs = data.pages.every(function(p){ return !!p.img; });
   if(hasImgs){
     storyResetBook();
@@ -3218,7 +3275,7 @@ async function storyExport(withImgs){
   const o = storyOpts();
   if(!withImgs && story.pages.some(function(pg){ return pg.kind === 'data'; })){ toast('呢本書有鏡頭影嘅版，冇原本檔案可以揀返，要用「匯出成本書（連頁面）」'); return; }
   const data = {app:'glm-vision-book', v:2, name:story.name, author:story.author, source:story.source, dir:$('sDir').value,
-    settings:{age:o.age, style:o.style, lang:o.lang, ask:o.ask},
+    settings:{age:o.age, style:o.style, lang:o.lang, ask:o.ask, desc:o.desc},
     pageCount:story.pages.length, done:storyReadyCount(), lastPage:story.idx >= 0 ? story.idx : story.sel, exported:new Date().toISOString(),
     pages:story.pages.map(function(pg, i){
       const c = story.cache[i] || {}, ok = storyReady(i);
@@ -3316,6 +3373,8 @@ function storyGen(i){
   if(storyReady(i)) return Promise.resolve();
   if(c.promise && c.key === story.key) return c.promise;
   const ctrl = storyCtrl(), o = storyOpts(), key = story.key;
+  if(c.state === 'done') storyArchive(c);              /* 舊講法嘅版本留低，改返設定就用返 */
+  const tok = c.genTok = (c.genTok || 0) + 1;          /* 同一版有新嘅準備開始，舊嗰個嘅結果就唔要 */
   c.key = key; c.state = 'loading'; c.text = ''; c.skip = false; c.err = null;
   c.promise = (async function(){
     try{
@@ -3330,23 +3389,25 @@ function storyGen(i){
       const res = await callVision([{role:'system', content:storySys(o)}, {role:'user', content:[{type:'text', text:head}, {type:'image_url', image_url:{url:c.img}}]}],
         {temp:0.5, signal:ctrl.signal,
          onNote:function(m){ if(i === story.idx) sSetStatus('⏳ ' + m); },
-         onDelta:function(d){ if(d.text && c.key === key){ const ps = storyParse(d.text); c.text = ps.body; if(ps.meta) c.meta = ps.meta; if(i === story.idx) storyOnText(i, false); } }});
-      if(c.key !== key) return;
+         onDelta:function(d){ if(d.text && c.genTok === tok){ const ps = storyParse(d.text); c.text = ps.body; if(ps.meta) c.meta = ps.meta; if(i === story.idx) storyOnText(i, false); } }});
+      if(c.genTok !== tok) return;
       const raw = String(res.text || '').trim(), ps = storyParse(raw);
       c.text = ps.partial ? raw.replace(/^@@[^\n]*\n?/, '').trim() : ps.body;
       if(ps.meta) c.meta = ps.meta;
       c.skip = (c.meta && c.meta.type === 'skip') || /^【?\s*跳過\s*】?[。.]?$/.test(c.text);
       if((c.meta && c.meta.type === 'cover') || pg.isCover) storyCoverMeta(c.meta);
       c.state = 'done'; c.usage = res.usage; c.fails = 0;
+      storyArchive(c);
       if(res.usage) story.spent += costOf(res.usage.prompt_tokens || 0, res.usage.completion_tokens || 0);
       if(i === story.idx) storyOnText(i, true);
     }catch(e){
+      if(c.genTok !== tok) return;
       c.promise = null;
       if(e.stopped || ctrl.signal.aborted){ c.state = 'idle'; return; }
       c.state = 'err'; c.err = e; c.fails = (c.fails || 0) + 1;
       if(i === story.idx){ sSetStatus('❌ ' + storyLabel(i, true) + ' 出錯：' + String(e.message || e).split('\n')[0] + '　撳 🔁 再試。'); ttsCue('呢頁出錯'); }
     }finally{
-      c.promise = null;
+      if(c.genTok === tok) c.promise = null;
       storyPrefetchAhead(); storyProgress(); storyStrip(); storyStartOptions(); storyBookInfo();
       if(i === story.idx) storyRenderSpread();
     }
@@ -3473,7 +3534,7 @@ function storyHaltAll(){
 function storyRefreshUI(){
   const o = storyOpts(), N = story.pages.length;
   const inT = Math.round((imgTokens(1131, 1600) + 1100 + 300) * calFactor());
-  const outT = thinkTokens() + ({k:250, p1:400, p4:600, adult:700}[o.age] || 400) + (o.style === 'teach' ? 300 : 0);
+  const outT = thinkTokens() + ({k1:200, k3:250, p1:400, p4:600, adult:700}[o.age] || 400) + (o.style === 'teach' ? 300 : 0) + ({less:-80, mid:0, more:150}[o.desc] || 0);
   const per = costOf(inT, outT), left = N ? N - storyReadyCount() : 0;
   $('sEst').textContent = '估計每頁大約 ' + n0(inT) + ' → ' + n0(outT) + ' token（' + fmtUSD(per) + '）'
     + (N ? '，成本書 ' + N + ' 頁大約 ' + fmtUSD(per * N) + (left < N ? '（未準備嘅 ' + left + ' 頁大約 ' + fmtUSD(per * left) + '）' : '') + '。' : '。')
@@ -3522,6 +3583,45 @@ $('sGo').onclick = function(){
   if($('sMode').value === 'all') storyBatchRun();
   $('sStage').scrollIntoView({behavior:'smooth', block:'start'});
 };
+/* ---------- 即場調整：程度、描述、語速 ---------- */
+function storyTuneUI(){
+  const o = storyOpts();
+  document.querySelectorAll('#sTuneAge button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.v === o.age ? 'true' : 'false'); });
+  document.querySelectorAll('#sTuneDesc button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.v === o.desc ? 'true' : 'false'); });
+  $('sRateV').textContent = '×' + (+cfg().qRate || 1).toFixed(1);
+}
+/* 改咗講法：即刻用新講法重講而家呢版（之前講過嘅版本留住） */
+function storyRetune(what){
+  const nk = storyKey(storyOpts());
+  storyTuneUI(); storyRefreshUI();
+  if(!story.pages.length || nk === story.key) return;
+  story.key = nk; story.lang = storyOpts().lang;
+  if(story.batchOn && !story.batchPaused){ story.batchPaused = true; toast('改咗講法，全本準備暫停咗；要用新講法準備全本就撳「繼續準備」'); }
+  const o = storyOpts();
+  const msg = '改咗' + what + '：' + STORY_AGE_SHORT[o.age] + '・' + STORY_DESC_SHORT[o.desc];
+  if(story.reading && story.idx >= 0){
+    const had = storyReady(story.idx);
+    storyGo(story.idx);
+    sSetStatus((had ? '🔁 ' + msg + '（之前講過，即刻用返）' : '⏳ ' + msg + '，重新準備緊呢版…'));
+  }else toast(msg + '。之後講嘅版會用新講法。');
+}
+function storySetRate(r){
+  r = Math.max(0.5, Math.min(2, Math.round(r * 10) / 10));
+  cfgPatch('qRate', r);
+  $('qRate').value = r; $('qRateV').textContent = '×' + r.toFixed(1);
+  storyTuneUI();
+  /* 讀緊嗰句即刻用新速度重讀 */
+  if(tts.speaking && ttsSupported()){ tts.token++; tts.speaking = false; speechSynthesis.cancel(); ttsPump(); }
+}
+document.querySelectorAll('#sTuneAge button').forEach(function(b){
+  b.onclick = function(){ ttsUnlock(); $('sAge').value = b.dataset.v; cfgPatch('sAge', b.dataset.v); storyRetune('程度'); };
+});
+document.querySelectorAll('#sTuneDesc button').forEach(function(b){
+  b.onclick = function(){ ttsUnlock(); $('sDesc').value = b.dataset.v; cfgPatch('sDesc', b.dataset.v); storyRetune('描述'); };
+});
+$('sSlower').onclick = function(){ ttsUnlock(); storySetRate((+cfg().qRate || 1) - 0.1); };
+$('sFaster').onclick = function(){ ttsUnlock(); storySetRate((+cfg().qRate || 1) + 0.1); };
+
 $('sCapBtn').onclick = function(){ if($('sCap').hidden) sCapOpen(); else sCapClose(); };
 $('sCapDone').onclick = sCapClose;
 $('sShotCover').onclick = function(){ sShoot(true); };
@@ -3638,7 +3738,8 @@ document.addEventListener('keydown', function(e){
 window.addEventListener('resize', function(){ if(curView === 'story' && story.idx >= 0) storyRenderSpread(); });
 (function(){
   const c = cfg();
-  $('sAge').value = STORY_AGE[c.sAge] ? c.sAge : 'p1';
+  $('sAge').value = storyAgeFix(c.sAge);
+  $('sDesc').value = /^(less|mid|more)$/.test(c.sDesc) ? c.sDesc : 'mid';
   $('sStyle').value = /^(tell|read|teach)$/.test(c.sStyle) ? c.sStyle : 'tell';
   $('sLang').value = /^(yue|en|cmn)$/.test(c.sLang) ? c.sLang : 'yue';
   $('sMode').value = /^(ahead1|ahead2|all)$/.test(c.sMode) ? c.sMode : 'ahead1';
@@ -3646,18 +3747,13 @@ window.addEventListener('resize', function(){ if(curView === 'story' && story.id
   $('sCover').value = c.sCover === 'paired' ? 'paired' : 'alone';
   $('sDir').value = c.sDir === 'rtl' ? 'rtl' : 'ltr';
   $('sAuto').checked = c.sAuto !== false; $('sAskKid').checked = !!c.sAskKid;
-  ['sAge', 'sStyle', 'sLang', 'sAskKid'].forEach(function(id){
+  ['sAge', 'sStyle', 'sLang', 'sAskKid', 'sDesc'].forEach(function(id){
     $(id).onchange = function(){
       cfgPatch(id, $(id).type === 'checkbox' ? $(id).checked : $(id).value);
-      const nk = storyKey(storyOpts());
-      if(story.pages.length && nk !== story.key){
-        const had = storyReadyCount();
-        story.key = nk; story.lang = storyOpts().lang;
-        if(had) sSetStatus('改咗講法：之前準備好嘅 ' + had + ' 頁要用新講法重新準備（改返原本設定就會用返舊嘅）。撳 🔁 用新講法講返呢頁。');
-      }
-      storyRefreshUI();
+      storyRetune({sAge:'程度', sStyle:'講法', sLang:'語言', sAskKid:'問問題設定', sDesc:'描述'}[id]);
     };
   });
+  storyTuneUI();
   ['sView', 'sCover', 'sDir'].forEach(function(id){ $(id).onchange = function(){ cfgPatch(id, $(id).value); storyRenderSpread(); storyStrip(); }; });
   $('sMode').onchange = function(){ cfgPatch('sMode', $('sMode').value); storyRefreshUI(); if(story.reading) storyPrefetchAhead(); };
   $('sStartSel').onchange = function(){ story.sel = (parseInt($('sStartSel').value, 10) || 1) - 1; storyStrip(); };
